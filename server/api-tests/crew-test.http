@@ -1,12 +1,17 @@
+﻿@base_url = http://localhost:8000/api
+@mission_id = 1
+@token = dummy_token
+
 ### join mission
+# @prompt token Paste your JWT Token here
 # @prompt mission_id Mission ID to Join
 POST  {{base_url}}/crew/join/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
-
+Authorization: Bearer {{token}}
 
 ### leave mission
+# @prompt token Paste your JWT Token here
 # @prompt mission_id Mission ID to Leave
 DELETE  {{base_url}}/crew/leave/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
+Authorization: Bearer {{token}}

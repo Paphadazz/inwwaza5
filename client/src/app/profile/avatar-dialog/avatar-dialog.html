@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Upload Avatar</h2>
+<mat-dialog-content>
+  <div class="upload-container">
+    <div class="preview-area" [class.has-image]="previewUrl">
+      @if (previewUrl) {
+        <img [src]="previewUrl" alt="Avatar Preview" class="avatar-preview" />
+      } @else {
+        <div class="placeholder">
+          <mat-icon>image</mat-icon>
+          <span>No image selected</span>
+        </div>
+      }
+    </div>
+
+    <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden />
+
+    <button mat-stroked-button color="primary" (click)="fileInput.click()" [disabled]="isUploading">
+      <mat-icon>upload_file</mat-icon>
+      Pick Image
+    </button>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="isUploading">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="upload()"
+    [disabled]="!base64String || isUploading"
+  >
+    @if (isUploading) {
+      Uploading...
+    } @else {
+      Upload
+    }
+  </button>
+</mat-dialog-actions>

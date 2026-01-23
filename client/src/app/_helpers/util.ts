@@ -7,3 +7,8 @@ export function getAvatarUrl(passport: Passport | undefined): string {
     if (passport && passport.avatar_url) return passport.avatar_url
     return _default_avatar
 }
+
+export function getBrawlerAvatarUrl(brawler: Brawler | undefined): string {
+    if (brawler && brawler.avatar_url) return brawler.avatar_url
+    return _default_avatar
+}

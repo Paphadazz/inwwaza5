@@ -1,20 +1,26 @@
+﻿@base_url = http://localhost:8000/api
 
-### register
-# @prompt username
-POST http://127.0.0.1:8000/api/brawler/register
+### Register
+# @name register
+# @prompt username Username (ex: menta)
+# @prompt password Password (ex: password123)
+POST {{base_url}}/authentication/register
 Content-Type: application/json
 
 {
-    "username":"{{username}}",
-    "password":"P@ssw0rd"
+    "username": "{{username}}",
+    "password": "{{password}}",
+    "display_name": "{{username}}"
 }
 
-### login
-# @prompt username
-POST http://127.0.0.1:8000/api/authentication/login
+### Login
+# @name login
+# @prompt username Username (ex: menta)
+# @prompt password Password (ex: password123)
+POST {{base_url}}/authentication/login
 Content-Type: application/json
 
 {
-    "username":"{{username}}",
-    "password":"P@ssw0rd"
+  "username": "{{username}}",
+  "password": "{{password}}"
 }

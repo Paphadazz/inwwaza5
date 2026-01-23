@@ -1,7 +1,8 @@
-### health-check
-GET http://127.0.0.1:8000/api/util/health-check
+﻿@base_url = http://localhost:8000/api
 
+### health-check
+GET {{base_url}}/util/health-check
 
 ### make-error
 # @prompt code status code
-GET http://127.0.0.1:8000/api/util/make-error/{{code}}
+GET {{base_url}}/util/make-error/{{code}}

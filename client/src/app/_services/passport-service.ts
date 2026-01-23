@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http'
+﻿import { HttpClient } from '@angular/common/http'
 import { inject, Injectable, signal } from '@angular/core'
-import { environment } from '../../environments/environment' ///
+import { environment } from '../../environments/environment'
 import { LoginModel, Passport, RegisterModel } from '../_models/passport'
 import { firstValueFrom } from 'rxjs'
-import { H } from '@angular/cdk/keycodes'
 import { getAvatarUrl } from '../_helpers/util'
 
 @Injectable({
@@ -18,11 +17,11 @@ export class PassportService {
   avatar = signal<string>("")
 
   saveAvatarImgUrl(url: string) {
-    let passport = this.data()
+    const passport = this.data()
     if (passport) {
-      passport.avatar_url = url
+      const updatedPassport = { ...passport, avatar_url: url }
       this.avatar.set(url)
-      this.data.set(passport)
+      this.data.set(updatedPassport)
       this.savePassportToLocalStorage()
     }
   }
@@ -64,7 +63,7 @@ export class PassportService {
   }
 
   async register(register: RegisterModel): Promise<null | string> {
-    const api_url = this._base_url + '/brawler/register'
+    const api_url = this._base_url + '/authentication/register'
     return await this.fetchPassport(api_url, register)
   }
 
@@ -72,15 +71,12 @@ export class PassportService {
     try {
       const result = this._http.post<Passport>(api_url, model)
       const passport = await firstValueFrom(result)
+
       this.data.set(passport)
       this.savePassportToLocalStorage()
       return null
     } catch (error: any) {
-      // console.error(error)
-      // console.log(error.error)
       return error.error
     }
-
   }
-
 }

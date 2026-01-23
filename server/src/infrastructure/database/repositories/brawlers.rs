@@ -1,4 +1,4 @@
-use anyhow::{Ok, Result};
+﻿use anyhow::{Ok, Result};
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use diesel::{
@@ -57,6 +57,7 @@ impl BrawlerRepository for BrawlerPostgres {
             token,
             display_name,
             avatar_url: None,
+            id: user_id,
         })
     }
 

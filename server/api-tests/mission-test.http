@@ -1,25 +1,30 @@
+﻿@base_url = http://localhost:8000/api
+@mission_id = 1
+@mission_name = test_mission
+@description = test_description
+@token = dummy_token
+
 ### create new mission
+# @prompt token Paste your JWT Token here (Bearer ...)
 # @prompt mission_name Mission Name
 # @prompt description Mission Description
 POST {{base_url}}/mission-management
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
-
+Authorization: Bearer {{token}}
 
 {
     "name": "{{mission_name}}",
     "description":"{{description}}"
 }
 
-
 ### update mission
+# @prompt token Paste your JWT Token here
 # @prompt mission_id Mission ID
 # @prompt mission_name Mission Name
 # @prompt description Mission Description
 PATCH {{base_url}}/mission-management/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
-
+Authorization: Bearer {{token}}
 
 {
     "name": "{{mission_name}}",
@@ -28,28 +33,32 @@ Authorization: Bearer {{menta_token}}
 
 
 ### remove mission
+# @prompt token Paste your JWT Token here
 # @prompt mission_id Mission ID
 DELETE {{base_url}}/mission-management/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
+Authorization: Bearer {{token}}
 
 
 ### set mission to in-progress
-# @prompt mission_id Mission ID to Set In-Progress
+# @prompt token Paste your JWT Token here
+# @prompt mission_id Mission ID
 PATCH  {{base_url}}/mission/in-progress/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
+Authorization: Bearer {{token}}
 
 
 ### set mission to completed
-# @prompt mission_id Mission ID to Set Completed
+# @prompt token Paste your JWT Token here
+# @prompt mission_id Mission ID
 PATCH  {{base_url}}/mission/to-completed/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
+Authorization: Bearer {{token}}
 
 
 ### set mission to failed
-# @prompt mission_id Mission ID to Set Failed
+# @prompt token Paste your JWT Token here
+# @prompt mission_id Mission ID
 PATCH  {{base_url}}/mission/to-failed/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta_token}}
+Authorization: Bearer {{token}}

@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core'
-import { Router } from '@angular/router'
-import { PassportService } from '../_services/passport-service'
-import { HttpClient } from '@angular/common/http'
-import { environment } from '../../environments/environment'
+import { Component, inject } from '@angular/core';
+import { PassportService } from '../_services/passport-service';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -11,19 +11,19 @@ import { environment } from '../../environments/environment'
   styleUrl: './home.scss',
 })
 export class Home {
-  private _router = inject(Router)
-  private _passport = inject(PassportService)
+  private _passport = inject(PassportService);
+  private _router = inject(Router);
+  private _http = inject(HttpClient);
 
   constructor() {
-    if (!this._passport.data())
-      this._router.navigate(['/login'])
+    if (!this._passport.data()) {
+      this._router.navigate(['/login']);
+    }
   }
 
-  // private _http = inject(HttpClient)
-  // makeError(code: number) {
-  //   const url = environment.baseUrl + '/api/util/make-error/' + code
-  //   this._http.get(url).subscribe({
-  //     error: e => console.log(e)
-  //   })
-  // }
+  onError(code: number) {
+    this._http.get(environment.baseUrl + '/api/error/' + code).subscribe({
+      error: (e) => console.error(e),
+    });
+  }
 }
