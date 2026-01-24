@@ -78,6 +78,7 @@ pub async fn upload(base64_image: Base64Img, option: UploadImageOptions) -> Resu
         .context(format!("upload to {}", url))?;
 
     let text = response.text().await?;
+    println!("Cloudinary response: {}", text);
     let json: UploadedImg =
         serde_json::from_str(&text).context(format!("failed to parse:\n\n {}", text))?;
     Ok(json)
