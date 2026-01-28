@@ -1,0 +1,17 @@
+<h4 mat-dialog-title>New Mission</h4>
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Mission Name</mat-label>
+    <input matInput type="text" [(ngModel)]="addMission.name" placeholder="Mission Name" required />
+  </mat-form-field>
+  
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Mission Description</mat-label>
+    <textarea matInput [(ngModel)]="addMission.description" placeholder="Mission Description" rows="4"></textarea>
+  </mat-form-field>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!addMission.name">Create</button>
+  </mat-dialog-actions>
+</mat-dialog-content>

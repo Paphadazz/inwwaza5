@@ -1,22 +1,25 @@
-﻿use anyhow::{Ok, Result};
+use anyhow::{Ok, Result};
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use diesel::{
     ExpressionMethods, RunQueryDsl, SelectableHelper, insert_into,
-    query_dsl::methods::{FilterDsl, SelectDsl},
+    QueryDsl,
 };
 use std::sync::Arc;
 
 use crate::{
     config::config_loader::get_jwt_env,
     domain::{
-        entities::brawlers::{BrawlerEntity, RegisterBrawlerEntity},
+        entities::{
+            brawlers::{BrawlerEntity, RegisterBrawlerEntity},
+            missions::MissionEntity,
+        },
         repositories::brawlers::BrawlerRepository,
         value_objects::{base64_img::Base64Img, uploaded_img::UploadedImg},
     },
     infrastructure::{
         cloudinary::{self, UploadImageOptions},
-        database::{postgresql_connection::PgPoolSquad, schema::brawlers},
+        database::{postgresql_connection::PgPoolSquad, schema::{brawlers, crew_memberships, missions}},
         jwt::{
             generate_token,
             jwt_model::{Claims, Passport},
@@ -91,5 +94,27 @@ impl BrawlerRepository for BrawlerPostgres {
             .execute(&mut conn)?;
 
         Ok(uploaded_img)
+    }
+
+    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+        let mut connection = Arc::clone(&self.db_pool).get()?;
+
+        let count: i64 = crew_memberships::table
+            .filter(crew_memberships::mission_id.eq(mission_id))
+            .count()
+            .get_result(&mut connection)?;
+
+        Ok(count as u32)
+    }
+
+    async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionEntity>> {
+        let mut connection = Arc::clone(&self.db_pool).get()?;
+
+        let result = missions::table
+            .filter(missions::chief_id.eq(brawler_id))
+            .select(MissionEntity::as_select())
+            .load::<MissionEntity>(&mut connection)?;
+
+        Ok(result)
     }
 }

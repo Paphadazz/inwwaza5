@@ -29,7 +29,7 @@ export class Navbar {
   }
 
   logout() {
-    this._passport.destroy();
+    this._passport.logout();
     this._router.navigate(['/login']);
   }
 }

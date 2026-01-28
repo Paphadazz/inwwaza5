@@ -25,12 +25,12 @@ export class Profile {
       width: '400px',
     });
 
-    // The UserService already updates the passport via saveAvatarImgUrl
+    // The UserService already updates the passport via updateAvatar
     // No need to handle the dialog result here
   }
 
   logout() {
-    this.passportService.destroy();
+    this.passportService.logout();
     this._router.navigate(['/login']);
   }
 }

@@ -1,7 +1,8 @@
 <mat-toolbar class="navbar-cm">
-  <span routerLink="/" style="cursor: pointer">My Application</span>
+  <span routerLink="/" style="cursor: pointer">The Convergence</span>
   <div>
     <button mat-button routerLink="/">Home</button>
+    <button mat-button routerLink="/missions" routerLinkActive="active">Missions</button>
     @if (!display_name()) {
     <button mat-button routerLink="/login">Login</button>
     } @else {

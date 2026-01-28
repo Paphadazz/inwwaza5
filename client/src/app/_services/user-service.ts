@@ -23,9 +23,9 @@ export class UserService {
     try {
       // console.log(uploadImg.base64_string)
       const cloudinaryImg = await firstValueFrom(this._http.post<CloudinaryImage>(url, uploadImg))
-      this._passport.saveAvatarImgUrl(cloudinaryImg.url)
+      this._passport.updateAvatar(cloudinaryImg.url)
     } catch (error: any) {
-      return error.error as string
+      return (error.error as string) || 'Unknown error'
     }
     return null
   }

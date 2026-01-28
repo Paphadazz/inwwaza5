@@ -24,3 +24,9 @@ Content-Type: application/json
   "username": "{{username}}",
   "password": "{{password}}"
 }
+
+### Get My Missions
+# @name get_my_missions
+GET {{base_url}}/brawler/missions
+Authorization: Bearer {{login.response.body.token}}
+

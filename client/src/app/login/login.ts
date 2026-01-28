@@ -38,7 +38,7 @@ export class Login {
   private _passport = inject(PassportService)
 
   constructor() {
-    if (this._passport.data())
+    if (this._passport.data()?.token)
       this._router.navigate(['/'])
     this.form = new FormGroup({
       username: new FormControl(null, [

@@ -3,6 +3,7 @@ use crate::{
         repositories::brawlers::BrawlerRepository,
         value_objects::{
             base64_img::Base64Img, brawler_model::RegisterBrawlerModel, uploaded_img::UploadedImg,
+            mission_model::MissionModel,
         },
     },
     infrastructure::{argon2::hash, cloudinary::UploadImageOptions, jwt::jwt_model::Passport},
@@ -59,5 +60,18 @@ where
             .await?;
 
         Ok(uploaded)
+    }
+
+    pub async fn get_missions_by_brawler(&self, brawler_id: i32) -> Result<Vec<MissionModel>> {
+        let mission_entities = self.brawler_repository.get_missions(brawler_id).await?;
+        
+        let mut mission_models = Vec::new();
+        
+        for mission in mission_entities {
+            let crew_count = self.brawler_repository.crew_counting(mission.id).await?;
+            mission_models.push(mission.to_model(crew_count as i64));
+        }
+        
+        Ok(mission_models)
     }
 }

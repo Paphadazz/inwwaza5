@@ -1,6 +1,9 @@
 use crate::{
     domain::{
-        entities::brawlers::{BrawlerEntity, RegisterBrawlerEntity},
+        entities::{
+            brawlers::{BrawlerEntity, RegisterBrawlerEntity},
+            missions::MissionEntity,
+        },
         value_objects::{base64_img::Base64Img, uploaded_img::UploadedImg},
     },
     infrastructure::{cloudinary::UploadImageOptions, jwt::jwt_model::Passport},
@@ -18,4 +21,6 @@ pub trait BrawlerRepository {
         base64img: Base64Img,
         opt: UploadImageOptions,
     ) -> Result<UploadedImg>;
+    async fn crew_counting(&self, mission_id: i32) -> Result<u32>;
+    async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionEntity>>;
 }
