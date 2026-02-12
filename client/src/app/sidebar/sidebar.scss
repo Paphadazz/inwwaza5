@@ -1,0 +1,73 @@
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 72px);
+  background-color: #1E3A8A;
+  color: white;
+  transition: all 0.3s ease;
+  position: fixed;
+  left: 0;
+  top: 72px;
+  z-index: 1000;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+
+  &.collapsed {
+    width: 70px;
+  }
+
+  mat-nav-list {
+    padding-top: 1rem;
+  }
+
+  .sidebar-item {
+    margin: 6px 12px;
+    height: 48px;
+    background: transparent !important; // Background unchanged in all states
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    // Default State: Text and Icon color = white
+    color: white !important;
+    
+    mat-icon {
+      color: white !important;
+      margin-right: 12px;
+      transition: color 0.2s ease;
+    }
+
+    [matListItemTitle] {
+      color: white !important;
+      transition: color 0.2s ease;
+    }
+
+    &:hover:not(.active-text) {
+      background-color: rgb(255, 254, 254) !important;
+    }
+
+    // Active Route: Text and Icon color = black, Background = unchanged
+    &.active-text {
+      background: transparent !important;
+      
+      mat-icon {
+        color: black !important;
+      }
+
+      [matListItemTitle] {
+        color: black !important;
+      }
+
+      // Ensure text color is black even if nested deep
+      color: black !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    left: -260px;
+    &.collapsed {
+      left: 0;
+      width: 260px;
+    }
+  }
+}

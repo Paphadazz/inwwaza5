@@ -1,17 +1,49 @@
-<h4 mat-dialog-title>New Mission</h4>
-<mat-dialog-content class="dialog-content">
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Mission Name</mat-label>
-    <input matInput type="text" [(ngModel)]="addMission.name" placeholder="Mission Name" required />
-  </mat-form-field>
-  
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Mission Description</mat-label>
-    <textarea matInput [(ngModel)]="addMission.description" placeholder="Mission Description" rows="4"></textarea>
-  </mat-form-field>
+<div class="dialog-header">
+  <h2 mat-dialog-title>{{ isEdit ? 'Edit Mission' : 'Create New Mission' }}</h2>
+  <button mat-icon-button mat-dialog-close class="close-btn">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Cancel</button>
-    <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!addMission.name">Create</button>
-  </mat-dialog-actions>
+<mat-dialog-content class="modern-form">
+  <div class="form-section">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Mission Name</mat-label>
+      <input matInput [(ngModel)]="addMission.name" placeholder="Enter mission name" required />
+      <mat-icon matPrefix>assignment</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="addMission.description" placeholder="Describe the mission goals..." rows="4"></textarea>
+      <mat-icon matPrefix>description</mat-icon>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Max Team Size</mat-label>
+        <input matInput type="number" [(ngModel)]="addMission.max_members" min="1" max="100" />
+        <mat-icon matPrefix>group</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="addMission.status">
+          <mat-option value="Open">Open</mat-option>
+          <mat-option value="InProgress">In Progress</mat-option>
+          <mat-option value="Completed">Completed</mat-option>
+          <mat-option value="Failed">Failed</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>info</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
 </mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!addMission.name" class="create-btn">
+    <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Update Mission' : 'Create Mission' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,76 @@
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="page-title">
+            <mat-icon>dashboard</mat-icon>
+            Mission Summary
+        </h1>
+    </div>
+
+    @if (loading()) {
+    <div class="loading-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading dashboard...</p>
+    </div>
+    } @else if (summary()) {
+    <div class="stats-grid">
+        <div class="stat-card created">
+            <div class="icon-wrapper">
+                <mat-icon>military_tech</mat-icon>
+            </div>
+            <div class="stat-content">
+                <h2 class="stat-value">{{summary()!.created_missions_count}}</h2>
+                <p class="stat-label">Created Missions</p>
+            </div>
+        </div>
+
+        <div class="stat-card joined">
+            <div class="icon-wrapper">
+                <mat-icon>groups</mat-icon>
+            </div>
+            <div class="stat-content">
+                <h2 class="stat-value">{{summary()!.joined_missions_count}}</h2>
+                <p class="stat-label">Joined Missions</p>
+            </div>
+        </div>
+
+        <div class="stat-card active">
+            <div class="icon-wrapper">
+                <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="stat-content">
+                <h2 class="stat-value">{{summary()!.active_missions_count}}</h2>
+                <p class="stat-label">Active Missions</p>
+            </div>
+        </div>
+
+        <div class="stat-card completed">
+            <div class="icon-wrapper">
+                <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="stat-content">
+                <h2 class="stat-value">{{summary()!.completed_missions_count}}</h2>
+                <p class="stat-label">Completed Missions</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="action-buttons">
+            <button mat-raised-button color="primary" (click)="navigateToMissions()">
+                <mat-icon>explore</mat-icon>
+                Browse Missions
+            </button>
+            <button mat-raised-button color="accent" (click)="navigateToMyMissions()">
+                <mat-icon>folder</mat-icon>
+                My Missions
+            </button>
+        </div>
+    </div>
+    } @else if (!loading() && !summary()) {
+    <div class="empty-state">
+        <mat-icon>sentiment_dissatisfied</mat-icon>
+        <p>No missions yet.</p>
+    </div>
+    }
+</div>

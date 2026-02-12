@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -13,4 +14,6 @@ use crate::{
 pub struct CrewMemberShips {
     pub brawler_id: i32,
     pub mission_id: i32,
+    pub joined_at: NaiveDateTime,
+    pub role: String,
 }

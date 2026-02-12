@@ -37,10 +37,13 @@ impl MissionManagementRepository for MissionManagementPostgres {
         let result = update(missions::table)
             .filter(missions::id.eq(mission_id))
             .filter(missions::deleted_at.is_null())
-            .filter(missions::status.eq(MissionStatuses::Open.to_string()))
+            //.filter(missions::status.eq(MissionStatuses::Open.to_string()))
             .set(edit_mission_entity)
             .returning(missions::id)
-            .get_result::<i32>(&mut conn)?;
+            .get_result::<i32>(&mut conn).map_err(|e| {
+                println!("Error editing mission: {:?}", e);
+                e
+            })?;
         Ok(result)
     }
 

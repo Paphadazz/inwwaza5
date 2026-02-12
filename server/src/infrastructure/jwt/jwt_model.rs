@@ -15,22 +15,32 @@ pub struct Passport {
     pub display_name: String,
     pub avatar_url: Option<String>,
     pub id: i32,
+    pub bio: Option<String>,
+    pub created_at: Option<String>,
 }
 
 impl Passport {
-    pub fn new(user_id: i32, display_name: String, avatar_url: Option<String>) -> Result<Self> {
+    pub fn new(
+        user_id: i32,
+        display_name: String,
+        avatar_url: Option<String>,
+        bio: Option<String>,
+        created_at: Option<String>,
+    ) -> Result<Self> {
         let jwt_env = get_jwt_env()?;
         let claims = Claims {
             sub: user_id.to_string(),
             exp: (Utc::now() + Duration::days(jwt_env.ttl)).timestamp() as usize,
             iat: Utc::now().timestamp() as usize,
         };
-        let token = generate_token(jwt_env.secret, &claims)?;     
+        let token = generate_token(jwt_env.secret, &claims)?;
         Ok(Self {
             token,
             display_name,
             avatar_url,
             id: user_id,
+            bio,
+            created_at,
         })
     }
 }

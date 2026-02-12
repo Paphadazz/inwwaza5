@@ -7,7 +7,7 @@ use axum::{
 
 use crate::{config::config_loader::get_jwt_env, infrastructure::jwt::verify_token};
 
-pub async fn auth(mut req: Request, next: Next) -> Result<Response, StatusCode> {
+pub async fn authorization(mut req: Request, next: Next) -> Result<Response, StatusCode> {
     let header = req
         .headers()
         .get(header::AUTHORIZATION)

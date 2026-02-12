@@ -16,9 +16,10 @@ export class ErrorService {
 
   handleError(error: any): Observable<never> {
     if (error) {
+      console.error('Backend Error details:', error); // Added logging as requested
+      
       switch (error.status) {
         case 400:
-          console.log(error)
           if (error.error === 'Record not found')
             this._snackBar.open("Invalid username or password", 'ok', this._snackBarConfig)
           else if (error.error !== '')
@@ -50,7 +51,7 @@ export class ErrorService {
           this._router.navigate(['/server-error'], navExtra)
           break
         default:
-          this._snackBar.open('some thing went wrong!!, please try again later', 'ok', this._snackBarConfig)
+          this._snackBar.open(error.error || 'Something went wrong, please try again later', 'ok', this._snackBarConfig)
           break
       }
     }

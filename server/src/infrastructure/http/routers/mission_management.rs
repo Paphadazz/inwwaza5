@@ -4,7 +4,6 @@ use axum::{
     Extension, Json, Router,
     extract::{Path, State},
     http::StatusCode,
-    middleware,
     response::IntoResponse,
     routing::{delete, patch, post},
 };
@@ -26,7 +25,7 @@ use crate::{
                 mission_viewing::MissionViewingPostgres,
             },
         },
-        http::middlewares::auth::auth,
+        http::middlewares::auth::authorization,
     },
 };
 
@@ -40,7 +39,11 @@ where
     T2: MissionViewingRepository + Send + Sync,
 {
     match user_case.add(user_id, model).await {
-        Ok(mission_id) => (StatusCode::CREATED, mission_id.to_string()).into_response(),
+        Ok(mission_id) => (
+            StatusCode::CREATED,
+            Json(serde_json::json!({ "mission_id": mission_id })),
+        )
+            .into_response(),
 
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -59,7 +62,7 @@ where
     match user_case.edit(mission_id, user_id, model).await {
         Ok(mission_id) => (
             StatusCode::OK,
-            format!("Edit mission_id: {} completed!!", mission_id),
+            Json(serde_json::json!({ "message": format!("Edit mission_id: {} completed!!", mission_id) })),
         )
             .into_response(),
 
@@ -97,6 +100,6 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         .route("/", post(add))
         .route("/{mission_id}", patch(edit))
         .route("/{mission_id}", delete(remove))
-        .route_layer(middleware::from_fn(auth))
+        .route_layer(axum::middleware::from_fn(authorization))
         .with_state(Arc::new(user_case))
 }

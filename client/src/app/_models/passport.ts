@@ -2,7 +2,9 @@
     token: string,
     display_name: string,
     avatar_url?: string,
-    id: number
+    id: number,
+    bio?: string,
+    created_at?: string
 }
 
 export interface RegisterModel {

@@ -1,16 +1,19 @@
-<style></style>
-<main class="container">
-  <ngx-spinner
-    bdColor="rgba(0, 0, 0, 0.8)"
-    size="medium"
-    color="#fff"
-    type="pacman"
-    [fullScreen]="true"
-    ><p style="color: white">Loading...</p></ngx-spinner
-  >
+<ngx-spinner
+  bdColor="rgba(0, 0, 0, 0.8)"
+  size="medium"
+  color="#fff"
+  type="pacman"
+  [fullScreen]="true"
+><p style="color: white">Loading...</p></ngx-spinner>
 
-  <app-navbar></app-navbar>
-  <div class="content">
-    <router-outlet></router-outlet>
+<div class="app-layout" [class.with-sidebar]="isLoggedIn()">
+  <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+  
+  <div class="main-wrapper">
+    <app-sidebar *ngIf="isLoggedIn()" [isCollapsed]="isSidebarCollapsed()"></app-sidebar>
+    
+    <main class="content-area" [class.expanded]="!isLoggedIn() || isSidebarCollapsed()">
+      <router-outlet></router-outlet>
+    </main>
   </div>
-</main>
+</div>

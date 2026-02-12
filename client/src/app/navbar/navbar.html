@@ -1,17 +1,42 @@
 <mat-toolbar class="navbar-cm">
-  <span routerLink="/" style="cursor: pointer">The Convergence</span>
-  <div>
-    <button mat-button routerLink="/">Home</button>
-    <button mat-button routerLink="/missions" routerLinkActive="active">Missions</button>
+  <div class="navbar-brand">
+    <button mat-icon-button class="mobile-menu-btn" (click)="toggleSidebar.emit()" *ngIf="display_name()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span routerLink="/" style="cursor: pointer">MissionLink</span>
+  </div>
+
+  <div class="navbar-actions">
+    @if(display_name()){
+      <button mat-button routerLink="/">Home</button>
+      <button mat-button routerLink="/missions" routerLinkActive="active">Missions</button>
+    }
+
+    <span class="spacer"></span>
+
     @if (!display_name()) {
-    <button mat-button routerLink="/login">Login</button>
+      <button mat-button routerLink="/login">Login</button>
     } @else {
-    <img [src]="avatar_url()" class="user-avatar" [matMenuTriggerFor]="menu" />
-    <button mat-button [matMenuTriggerFor]="menu">{{ display_name() }}</button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item routerLink="/profile">Profile</button>
-      <button mat-menu-item (click)="logout()">Logout</button>
-    </mat-menu>
+      <div class="user-profile-group" [matMenuTriggerFor]="menu">
+        <div class="avatar-container">
+          <img [src]="avatar_url()" class="user-avatar" />
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ display_name() }}</span>
+          <mat-icon class="dropdown-icon">expand_more</mat-icon>
+        </div>
+      </div>
+
+      <mat-menu #menu="matMenu" xPosition="before" class="modern-profile-menu">
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
     }
   </div>
 </mat-toolbar>

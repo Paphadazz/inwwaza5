@@ -1,0 +1,13 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <mat-nav-list>
+    <a mat-list-item *ngFor="let item of menuItems"
+       [routerLink]="item.route"
+       [routerLinkActiveOptions]="{ exact: true }"
+       routerLinkActive="active-text"
+       [matTooltip]="isCollapsed ? item.label : ''"
+       class="sidebar-item">
+      <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+      <span matListItemTitle *ngIf="!isCollapsed">{{item.label}}</span>
+    </a>
+  </mat-nav-list>
+</aside>

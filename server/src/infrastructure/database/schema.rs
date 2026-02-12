@@ -15,6 +15,7 @@ diesel::table! {
         avatar_url -> Nullable<Varchar>,
         #[max_length = 255]
         avatar_public_id -> Nullable<Varchar>,
+        bio -> Nullable<Text>,
     }
 }
 
@@ -23,6 +24,8 @@ diesel::table! {
         mission_id -> Int4,
         brawler_id -> Int4,
         joined_at -> Timestamp,
+        #[max_length = 255]
+        role -> Varchar,
     }
 }
 
@@ -38,6 +41,7 @@ diesel::table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         deleted_at -> Nullable<Timestamp>,
+        max_members -> Int4,
     }
 }
 
@@ -45,5 +49,4 @@ diesel::joinable!(crew_memberships -> brawlers (brawler_id));
 diesel::joinable!(crew_memberships -> missions (mission_id));
 diesel::joinable!(missions -> brawlers (chief_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    brawlers,crew_memberships,missions,);
+diesel::allow_tables_to_appear_in_same_query!(brawlers, crew_memberships, missions,);

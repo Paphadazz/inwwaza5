@@ -33,6 +33,7 @@ export class PassportService {
     if (!passport) return 'not found passport';
     const jsonString = JSON.stringify(passport);
     localStorage.setItem(this._key, jsonString);
+    this.isSignin.set(true);
     return null;
   }
 
@@ -73,7 +74,7 @@ export class PassportService {
     this.isSignin.set(true);
   }
 
-  logout() {
+  destroy() {
     this.data.set(undefined);
     this.isSignin.set(false);
     localStorage.removeItem(this._key);
@@ -83,6 +84,18 @@ export class PassportService {
     const current = this.data();
     if (current) {
       const updated = { ...current, avatar_url: url };
+      this.data.set(updated);
+      this.savePassportToLocalStorage();
+    }
+  }
+
+  async updateProfile(model: { display_name?: string, bio?: string }) {
+    await firstValueFrom(this._http.patch(`${this._base_url}/brawler/profile`, model));
+    const current = this.data();
+    if (current) {
+      const updated = { ...current };
+      if (model.display_name) updated.display_name = model.display_name;
+      if (model.bio !== undefined) updated.bio = model.bio;
       this.data.set(updated);
       this.savePassportToLocalStorage();
     }

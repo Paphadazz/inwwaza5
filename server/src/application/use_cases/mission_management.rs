@@ -68,16 +68,24 @@ where
             }
         }
 
-        let crew_count = self
-            .mission_viewing_repository
-            .crew_counting(mission_id)
-            .await?;
-        if crew_count > 0 {
-            return Err(anyhow::anyhow!(
-                "Mission has been taken by brawler for now!"
-            ));
-        }
 
+
+        let edit_mission_entity = edit_mission_model.to_entity(chief_id);
+
+        let result = self
+            .mission_management_repository
+            .edit(mission_id, edit_mission_entity)
+            .await?;
+
+        Ok(result)
+    }
+
+    pub async fn update(
+        &self,
+        mission_id: i32,
+        edit_mission_model: EditMissionModel,
+        chief_id: i32,
+    ) -> Result<i32> {
         let edit_mission_entity = edit_mission_model.to_entity(chief_id);
 
         let result = self

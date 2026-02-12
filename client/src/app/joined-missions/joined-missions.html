@@ -1,0 +1,60 @@
+<div class="joined-missions-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <mat-icon>groups</mat-icon>
+            Joined Missions
+        </h1>
+        <p class="page-subtitle">Missions you're part of as a crew member</p>
+    </div>
+
+    @if (loading()) {
+    <div class="loading-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading missions...</p>
+    </div>
+    } @else if (missions().length) {
+    <div class="mission-grid">
+        @for (mission of missions(); track mission.id) {
+        <div class="mission-card">
+            <div class="card-header">
+                <h3 class="mission-name">{{mission.name}}</h3>
+                <span class="status-badge" [class]="'status-' + mission.status.toLowerCase()">{{mission.status}}</span>
+            </div>
+
+            <p class="mission-desc">{{mission.description || 'No description provided'}}</p>
+
+            <div class="mission-stats">
+                <div class="stat">
+                    <mat-icon>person</mat-icon>
+                    <span>Chief: {{mission.chief_display_name}}</span>
+                </div>
+                <div class="stat">
+                    <mat-icon>group</mat-icon>
+                    <span>{{mission.crew_count}} / {{mission.max_members}} Members</span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button mat-raised-button color="primary" (click)="openWorkspace(mission.id)">
+                    <mat-icon>meeting_room</mat-icon>
+                    Open Workspace
+                </button>
+                <button mat-stroked-button color="warn" (click)="leaveMission(mission.id)">
+                    <mat-icon>logout</mat-icon>
+                    Leave
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="empty-state">
+        <mat-icon>explore</mat-icon>
+        <p>You haven't joined any missions yet.</p>
+        <button mat-raised-button color="primary" routerLink="/missions">
+            <mat-icon>search</mat-icon>
+            Browse Missions
+        </button>
+    </div>
+    }
+</div>

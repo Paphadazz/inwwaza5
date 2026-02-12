@@ -1,21 +1,90 @@
-<div class="container" style="padding: 20px">
-  <p>home works!</p>
-
-  <!-- Debug Info -->
-  @if (_passport.data(); as p) {
-    <div style="background: #e0f7fa; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
-      <h4>Debug Info: User Logged In</h4>
-      <pre>{{ p | json }}</pre>
-    </div>
-  } @else {
-    <div style="background: #ffebee; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
-      <h4>Debug Info: Not Logged In</h4>
-      <p>Passport data is empty.</p>
-    </div>
+<div class="dashboard-container">
+  @if (isLoading()) {
+  <div class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
   }
 
-  <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap">
-    <button (click)="onError(401)">401</button>
-    <button (click)="onError(500)">500</button>
+  <!-- 1. Welcome Section -->
+  <header class="welcome-section glass-morphism">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Welcome back, {{ user()?.display_name || 'Chief' }}</h1>
+      <p class="welcome-subtitle">Manage your missions </p>
+    </div>
+    <div class="quick-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ activeMissions().length }}</span>
+        <span class="stat-label">Active Missions</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-grid">
+    <!-- 2. My Active Missions -->
+    <section class="active-missions-section">
+      <div class="section-header">
+        <h2 class="section-title"><mat-icon>task_alt</mat-icon> My Active Missions</h2>
+      </div>
+
+      <div class="missions-list">
+        @if (activeMissions().length > 0) {
+        @for (mission of activeMissions(); track mission.id) {
+        <mat-card class="mission-item-card" appearance="outlined">
+          <mat-card-content>
+            <div class="mission-info">
+              <span class="mission-name">{{ mission.name }}</span>
+              <span class="mission-status-badge" [class]="mission.status.toLowerCase()">{{ mission.status }}</span>
+            </div>
+            <button mat-button color="primary" (click)="onViewMission(mission.id)">View Mission</button>
+          </mat-card-content>
+        </mat-card>
+        }
+        } @else {
+        <div class="empty-list-note">
+          <p>You haven't joined any missions yet.</p>
+          <button mat-flat-button color="accent" (click)="onBrowseAll()">Find a Mission</button>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- 4. Quick Actions (Moved up for better flow on desktop) -->
+    <aside class="quick-actions-section">
+      <div class="section-header">
+        <h2 class="section-title"><mat-icon>bolt</mat-icon> Quick Actions</h2>
+      </div>
+      <div class="actions-grid">
+        <button mat-flat-button color="primary" class="action-btn" (click)="onBrowseAll()">
+          <mat-icon>search</mat-icon> Browse All Missions
+        </button>
+        <button mat-stroked-button color="primary" class="action-btn" (click)="onCreateMission()">
+          <mat-icon>add</mat-icon> Create Mission
+        </button>
+      </div>
+    </aside>
+
+    <!-- 3. Featured Missions -->
+    <section class="featured-missions-section">
+      <div class="section-header">
+        <h2 class="section-title"><mat-icon>star</mat-icon> Featured Missions</h2>
+      </div>
+
+      <div class="featured-grid">
+        @for (mission of featuredMissions(); track mission.id) {
+        <mat-card class="featured-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>{{ mission.name }}</mat-card-title>
+            <span class="status-tag">Open</span>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="description">{{ mission.description }}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-flat-button color="primary" (click)="onJoinMission(mission.id)">Join</button>
+          </mat-card-actions>
+        </mat-card>
+        }
+      </div>
+    </section>
   </div>
 </div>

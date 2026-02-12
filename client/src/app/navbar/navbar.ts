@@ -1,19 +1,32 @@
-import { Component, computed, inject, signal, Signal } from '@angular/core';
+import { Component, computed, inject, signal, Signal, Output, EventEmitter } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { PassportService } from '../_services/passport-service';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatToolbarModule, MatButtonModule, RouterLink, MatMenuModule],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    MatToolbarModule, 
+    MatButtonModule, 
+    RouterLink, 
+    RouterLinkActive, 
+    MatMenuModule, 
+    MatIconModule
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
 export class Navbar {
   private _passport = inject(PassportService);
   private _router = inject(Router);
+
+  @Output() toggleSidebar = new EventEmitter<void>();
 
   display_name: Signal<string | undefined>;
   avatar_url: Signal<string | undefined>;
@@ -24,12 +37,12 @@ export class Navbar {
       return p?.display_name || (p?.token ? 'User' : undefined);
     });
     this.avatar_url = computed(
-      () => this._passport.data()?.avatar_url || '/assets/default.avatar.jpg',
+      () => this._passport.data()?.avatar_url || '/assets/default-avatar.jpg',
     );
   }
 
   logout() {
-    this._passport.logout();
+    this._passport.destroy();
     this._router.navigate(['/login']);
   }
 }

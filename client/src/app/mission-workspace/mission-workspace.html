@@ -1,0 +1,117 @@
+<div class="workspace-container" *ngIf="mission() as m">
+    <div class="workspace-header">
+        <div class="header-left">
+            <button mat-icon-button routerLink="/missions" aria-label="Back to missions">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h1>{{m.name}}</h1>
+        </div>
+
+        <div class="header-actions">
+            <button mat-stroked-button color="primary" (click)="navigateToDashboard()">
+                <mat-icon>dashboard</mat-icon>
+                View Mission Summary
+            </button>
+            <button mat-stroked-button color="warn" (click)="leave()" *ngIf="!isUserChief()">
+                <mat-icon ripple>logout</mat-icon>
+                Leave Mission
+            </button>
+        </div>
+    </div>
+
+    <div class="workspace-content">
+        <!-- Mission details section -->
+        <mat-card class="details-card">
+            <mat-card-header>
+                <mat-card-title>Mission Directive</mat-card-title>
+                <mat-card-subtitle>Commanded by: {{m.chief_display_name}}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p class="description">{{m.description || 'No specialized instructions provided.'}}</p>
+
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <mat-icon>info</mat-icon>
+                        <span><strong>Status:</strong> {{m.status | uppercase}}</span>
+                    </div>
+                    <div class="meta-item">
+                        <mat-icon>calendar_today</mat-icon>
+                        <span><strong>Initiated:</strong> {{m.created_at | date:'medium'}}</span>
+                    </div>
+                    <div class="meta-item">
+                        <mat-icon>group</mat-icon>
+                        <span><strong>Force:</strong> {{memberCount()}} / {{m.max_members}} Operatives</span>
+                    </div>
+                </div>
+
+                <!-- Settings for Chief -->
+                <div class="settings-section" *ngIf="isUserChief()">
+                    <h3><mat-icon>settings</mat-icon> Squad Configuration</h3>
+                    <div class="settings-grid">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Max Operatives</mat-label>
+                            <input matInput type="number" [value]="m.max_members" #maxInput
+                                (change)="updateMaxMembers(maxInput.value)">
+                            <mat-hint>Set team size limit</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Members section -->
+        <mat-card class="members-sidebar">
+            <mat-card-header>
+                <div class="members-header">
+                    <mat-card-title>Squad Roster</mat-card-title>
+                    <div class="count-badge">
+                        {{memberCount()}} / {{m.max_members}}
+                    </div>
+                </div>
+            </mat-card-header>
+            <mat-list>
+                <div mat-subheader>Active Personnel</div>
+                <mat-list-item *ngFor="let member of members()">
+                    <img matListItemAvatar [src]="member.avatar_url || 'assets/default-avatar.png'" alt="Avatar">
+
+                    <div matListItemTitle>
+                        <div class="member-content">
+                            <div class="member-header">
+                                <span class="member-name">{{member.display_name}}</span>
+                            </div>
+
+                            <div class="member-badges">
+                                <mat-chip-set>
+                                    <mat-chip *ngIf="isChief(member)" class="chief-chip" highlighted>Chief</mat-chip>
+                                    <mat-chip *ngIf="isCurrentUser(member)" class="you-chip">You</mat-chip>
+                                </mat-chip-set>
+
+                                <div *ngIf="!isUserChief() || isChief(member)" class="role-display">
+                                    {{member.role}}
+                                </div>
+
+                                <button class="role-select-btn" mat-button [matMenuTriggerFor]="roleMenu"
+                                    *ngIf="isUserChief() && !isChief(member)">
+                                    {{member.role}}
+                                    <mat-icon iconPositionEnd
+                                        style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;">arrow_drop_down</mat-icon>
+                                </button>
+                                <mat-menu #roleMenu="matMenu">
+                                    <button mat-menu-item *ngFor="let role of availableRoles"
+                                        (click)="updateRole(member.id, role)">
+                                        {{role}}
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </div>
+                    </div>
+                </mat-list-item>
+            </mat-list>
+        </mat-card>
+    </div>
+</div>
+
+<div class="loading-overlay" *ngIf="!mission()">
+    <mat-spinner diameter="50" color="accent"></mat-spinner>
+    <p>Synchronizing Workspace...</p>
+</div>

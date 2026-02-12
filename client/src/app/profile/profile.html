@@ -1,30 +1,106 @@
 <div class="profile-container">
-    @if (passportService.data(); as user) {
-    <mat-card class="profile-card">
-        <div class="avatar-section">
-            <div class="avatar-wrapper">
-                @if (user.avatar_url) {
-                <img [src]="user.avatar_url" alt="Avatar" class="avatar-image" />
-                } @else {
-                <div class="avatar-placeholder">
-                    <span>{{ user.display_name.charAt(0).toUpperCase() }}</span>
-                </div>
-                }
-                <button mat-mini-fab color="primary" class="edit-avatar-btn" (click)="openAvatarDialog()">
-                    <mat-icon>edit</mat-icon>
-                </button>
+  @if (passportService.data(); as user) {
+  <mat-card class="profile-card">
+    <div class="profile-cover">
+      </div>
+
+    <div class="card-content">
+      <div class="avatar-section">
+        <div class="avatar-wrapper">
+          @if (user.avatar_url) {
+          <img [src]="user.avatar_url" alt="Avatar" class="avatar-image" />
+          } @else {
+          <div class="avatar-placeholder">
+            <span>{{ user.display_name.charAt(0).toUpperCase() }}</span>
+          </div>
+          }
+          @if(!isEditing()) {
+            <button mat-mini-fab color="primary" class="edit-avatar-btn" (click)="openAvatarDialog()" matTooltip="Change Avatar">
+              <mat-icon>photo_camera</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="info-section">
+        @if(!isEditing()) {
+          <h2 class="user-name">{{ user.display_name }}</h2>
+          <p class="user-role">Member / Creator</p>
+
+          <div class="stats-row">
+            <div class="stat-item">
+              <mat-icon class="stat-icon">check_circle</mat-icon>
+              <span class="stat-count">{{ stats()?.active_missions_count ?? 0 }}</span>
+              <span class="stat-label">Active Missions</span>
             </div>
-        </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <mat-icon class="stat-icon">groups</mat-icon>
+              <span class="stat-count">{{ stats()?.joined_missions_count ?? 0 }}</span>
+              <span class="stat-label">Joined Missions</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <mat-icon class="stat-icon">create_new_folder</mat-icon>
+              <span class="stat-count">{{ stats()?.created_missions_count ?? 0 }}</span>
+              <span class="stat-label">Created Missions</span>
+            </div>
+          </div>
 
-        <div class="info-section">
-            <h2>{{ user.display_name }}</h2>
-        </div>
+          <p class="bio">{{ user.bio || 'No bio description yet.' }}</p>
 
-        <mat-card-actions>
-            <button mat-button color="warn" (click)="logout()">Logout</button>
-        </mat-card-actions>
-    </mat-card>
-    } @else {
-    <p>Loading profile...</p>
-    }
+           <div class="meta-info">
+            <span class="registration-date">
+              <mat-icon inline="true">verified</mat-icon>
+              Member since: {{ user.created_at | date:'mediumDate' }}
+            </span>
+          </div>
+
+          <div class="main-actions">
+            <button mat-flat-button color="primary" (click)="startEdit()">
+              <mat-icon>edit_note</mat-icon> Edit Profile
+            </button>
+            <button mat-stroked-button (click)="shareProfile()">
+               <mat-icon>share</mat-icon> Share
+            </button>
+          </div>
+
+        } @else {
+          <div class="edit-form-container">
+            <h3 class="edit-title">Edit Profile Details</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Display Name</mat-label>
+              <input matInput [(ngModel)]="editModel.display_name" placeholder="Display Name" maxlength="50">
+              <mat-hint align="end">{{editModel.display_name.length}} / 50</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Bio</mat-label>
+              <textarea matInput [(ngModel)]="editModel.bio" placeholder="Tell us about yourself..."
+                rows="4" maxlength="200"></textarea>
+               <mat-hint align="end">{{editModel.bio.length}} / 200</mat-hint>
+            </mat-form-field>
+
+            <div class="edit-actions">
+              <button mat-stroked-button (click)="cancelEdit()">Cancel</button>
+              <button mat-flat-button color="primary" (click)="saveEdit()">Save Changes</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if(!isEditing()) {
+      <div class="card-footer">
+        <button mat-button color="warn" class="logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon> Logout
+        </button>
+      </div>
+      }
+    </div> </mat-card>
+  } @else {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading profile...</p>
+    </div>
+  }
 </div>

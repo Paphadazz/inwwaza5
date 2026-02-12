@@ -1,6 +1,6 @@
 use anyhow::{Ok, Result};
 use async_trait::async_trait;
-use diesel::{ExpressionMethods, RunQueryDsl, dsl::delete, insert_into};
+use diesel::{ExpressionMethods, RunQueryDsl, dsl::delete, dsl::update, insert_into};
 use std::sync::Arc;
 
 use crate::{
@@ -27,6 +27,8 @@ impl CrewOperationRepository for CrewOperationPostgres {
         let mut conn = Arc::clone(&self.db_pool).get()?;
         insert_into(crew_memberships::table)
             .values(crew_member_ships)
+            .on_conflict((crew_memberships::mission_id, crew_memberships::brawler_id))
+            .do_nothing()
             .execute(&mut conn)?;
         Ok(())
     }
@@ -36,6 +38,16 @@ impl CrewOperationRepository for CrewOperationPostgres {
         delete(crew_memberships::table)
             .filter(crew_memberships::brawler_id.eq(crew_member_ships.brawler_id))
             .filter(crew_memberships::mission_id.eq(crew_member_ships.mission_id))
+            .execute(&mut conn)?;
+        Ok(())
+    }
+
+    async fn update_role(&self, mission_id: i32, brawler_id: i32, role: String) -> Result<()> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+        update(crew_memberships::table)
+            .filter(crew_memberships::mission_id.eq(mission_id))
+            .filter(crew_memberships::brawler_id.eq(brawler_id))
+            .set(crew_memberships::role.eq(role))
             .execute(&mut conn)?;
         Ok(())
     }

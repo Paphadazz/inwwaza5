@@ -1,7 +1,7 @@
-use std::sync::Arc;
+﻿use std::sync::Arc;
 
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
@@ -21,12 +21,14 @@ use crate::{
 
 pub async fn get_one<T>(
     State(user_case): State<Arc<MissionViewingUseCase<T>>>,
+    user_id_ext: Option<Extension<i32>>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T: MissionViewingRepository + Send + Sync,
 {
-    match user_case.get_one(mission_id).await {
+    let user_id = user_id_ext.map(|Extension(id)| id);
+    match user_case.get_one(mission_id, user_id).await {
         Ok(model) => (StatusCode::OK, Json(model)).into_response(),
 
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
@@ -49,14 +51,29 @@ where
 
 pub async fn get_all<T>(
     State(user_case): State<Arc<MissionViewingUseCase<T>>>,
+    user_id_ext: Option<Extension<i32>>,
     filter: Query<MissionFilter>,
 ) -> impl IntoResponse
 where
     T: MissionViewingRepository + Send + Sync,
 {
-    match user_case.get_all(&filter).await {
+    let user_id = user_id_ext.map(|Extension(id)| id);
+    match user_case.get_all(&filter, user_id).await {
         Ok(model) => (StatusCode::OK, Json(model)).into_response(),
 
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
+}
+
+pub async fn get_joined<T>(
+    State(user_case): State<Arc<MissionViewingUseCase<T>>>,
+    Extension(user_id): Extension<i32>,
+) -> impl IntoResponse
+where
+    T: MissionViewingRepository + Send + Sync,
+{
+    match user_case.get_joined(user_id).await {
+        Ok(models) => (StatusCode::OK, Json(models)).into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
@@ -69,6 +86,10 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         .route("/{mission_id}", get(get_one))
         .route("/filter", get(get_all))
         .route("/crew/{mission_id}", get(get_crew))
-        // .route_layer(middleware::from_fn(auth))
+        .route("/joined", get(get_joined))
+        .route_layer(axum::middleware::from_fn(
+            crate::infrastructure::http::middlewares::optional_auth::optional_authorization,
+        ))
         .with_state(Arc::new(user_case))
 }
+

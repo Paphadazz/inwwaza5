@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
 use axum::{
-    Extension, Router,
+    Extension, Router, Json,
     extract::{Path, State},
     http::StatusCode,
-    middleware,
     response::IntoResponse,
     routing::{delete, post},
 };
+use serde_json::json;
 
 use crate::{
-    application::use_cases::crew_operation::CrewOperationUseCase,
+    application::use_cases::crew_operation::CrewOperationUseCase, 
     domain::repositories::{
         crew_operation::CrewOperationRepository, mission_viewing::MissionViewingRepository,
     },
@@ -21,7 +21,7 @@ use crate::{
                 crew_operation::CrewOperationPostgres, mission_viewing::MissionViewingPostgres,
             },
         },
-        http::middlewares::auth::auth,
+        http::middlewares::auth::authorization,
     },
 };
 
@@ -37,16 +37,19 @@ where
     match user_case.join(mission_id, user_id).await {
         Ok(_) => (
             StatusCode::OK,
-            format!("Join Mission_id:{} completed", mission_id),
+            Json(json!({ "success": true, "message": format!("Join Mission_id:{} completed", mission_id) })),
         )
             .into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "success": false, "message": e.to_string() })),
+        ).into_response(),
     }
 }
 
 pub async fn leave<T1, T2>(
-    State(user_case): State<Arc<CrewOperationUseCase<T1, T2>>>,
+    State(user_case): State<Arc<CrewOperationUseCase<T1, T2>>>,   
     Extension(user_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
@@ -57,11 +60,14 @@ where
     match user_case.leave(mission_id, user_id).await {
         Ok(_) => (
             StatusCode::OK,
-            format!("Leave Mission_id:{} completed", mission_id),
+            Json(json!({ "success": true, "message": "Left mission successfully" })),
         )
             .into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "success": false, "message": e.to_string() })),
+        ).into_response(),
     }
 }
 
@@ -76,6 +82,6 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     Router::new()
         .route("/join/{mission_id}", post(join))
         .route("/leave/{mission_id}", delete(leave))
-        .route_layer(middleware::from_fn(auth))
+        .route_layer(axum::middleware::from_fn(authorization))    
         .with_state(Arc::new(user_case))
 }

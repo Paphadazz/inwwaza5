@@ -17,19 +17,23 @@ pub struct MissionEntity {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub deleted_at: Option<NaiveDateTime>,
+    pub max_members: i32,
 }
 
 impl MissionEntity {
-    pub fn to_model(&self, crew_count: i64) -> MissionModel {
+    pub fn to_model(&self, chief_display_name: String, crew_count: i64) -> MissionModel {
         MissionModel {
             id: self.id,
             name: self.name.clone(),
             description: self.description.clone(),
             status: self.status.clone(),
             chief_id: self.chief_id,
+            chief_display_name,
             crew_count,
+            max_members: self.max_members,
             created_at: self.created_at,
             updated_at: self.updated_at,
+            is_joined: false,
         }
     }
 }
@@ -41,6 +45,7 @@ pub struct AddMissionEntity {
     pub name: String,
     pub status: String,
     pub description: Option<String>,
+    pub max_members: i32,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -49,4 +54,6 @@ pub struct EditMissionEntity {
     pub chief_id: i32,
     pub name: Option<String>,
     pub description: Option<String>,
+    pub max_members: Option<i32>,
+    pub status: Option<String>,
 }

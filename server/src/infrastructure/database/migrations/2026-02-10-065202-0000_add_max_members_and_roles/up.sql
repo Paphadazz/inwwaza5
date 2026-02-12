@@ -1,0 +1,2 @@
+ALTER TABLE missions ADD COLUMN max_members INT NOT NULL DEFAULT 10;
+ALTER TABLE crew_memberships ADD COLUMN role VARCHAR(255) NOT NULL DEFAULT 'Member';

@@ -42,7 +42,13 @@ where
         }
         println!("Password verification successful!");
 
-        let passport = Passport::new(user.id, user.display_name, user.avatar_url)?;
+        let passport = Passport::new(
+            user.id,
+            user.display_name,
+            user.avatar_url,
+            user.bio,
+            Some(user.created_at.format("%Y-%m-%dT%H:%M:%SZ").to_string()),
+        )?;
         Ok(passport)
     }
 

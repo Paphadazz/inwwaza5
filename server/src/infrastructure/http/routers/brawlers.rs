@@ -2,18 +2,18 @@ use std::sync::Arc;
 
 use axum::{
     Extension, Json, Router, extract::State, http::StatusCode, response::IntoResponse,
-    routing::{get, post},
+    routing::{get, post, patch},
 };
 
 use crate::{
     application::use_cases::brawlers::BrawlersUseCase,
     domain::{
         repositories::brawlers::BrawlerRepository,
-        value_objects::uploaded_img::UploadBase64Img,
+        value_objects::{uploaded_img::UploadBase64Img, brawler_model::UpdateBrawlerModel},
     },
     infrastructure::{
         database::{postgresql_connection::PgPoolSquad, repositories::brawlers::BrawlerPostgres},
-        http::middlewares::auth::auth,
+        http::middlewares::auth::authorization,
     },
 };
 
@@ -23,8 +23,9 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
 
     let protected_routes = Router::new()
         .route("/avatar", post(upload_avatar))
-        .route("/missions", get(get_my_missions))
-        .route_layer(axum::middleware::from_fn(auth));
+        .route("/profile", patch(update_profile))
+        .route("/my-missions", get(get_missions))
+        .route_layer(axum::middleware::from_fn(authorization));
 
     Router::new()
         .merge(protected_routes)
@@ -49,7 +50,7 @@ where
     }
 }
 
-pub async fn get_my_missions<T>(
+pub async fn get_missions<T>(
     State(user_case): State<Arc<BrawlersUseCase<T>>>,
     Extension(user_id): Extension<i32>,
 ) -> impl IntoResponse
@@ -58,6 +59,20 @@ where
 {
     match user_case.get_missions_by_brawler(user_id).await {
         Ok(missions) => (StatusCode::OK, Json(missions)).into_response(),
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
+}
+
+pub async fn update_profile<T>(
+    State(user_case): State<Arc<BrawlersUseCase<T>>>,
+    Extension(user_id): Extension<i32>,
+    Json(model): Json<UpdateBrawlerModel>,
+) -> impl IntoResponse
+where
+    T: BrawlerRepository + Send + Sync,
+{
+    match user_case.update_profile(user_id, model).await {
+        Ok(_) => StatusCode::OK.into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
