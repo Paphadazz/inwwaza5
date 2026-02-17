@@ -3,7 +3,7 @@
         <mat-icon class="search-icon">search</mat-icon>
         <input type="text" [(ngModel)]="filter.name" placeholder="Search mission name..." />
     </div>
-    
+
     <div class="filter-group">
         <mat-icon class="filter-icon">filter_list</mat-icon>
         <select [(ngModel)]="filter.status">
@@ -14,7 +14,7 @@
             <option value="Failed">Failed</option>
         </select>
     </div>
-    
+
     <button (click)="onSubmit()" class="go-btn">
         <mat-icon>search</mat-icon>
         Search
@@ -25,6 +25,7 @@
     @if((missions$ | async)?.length) {
     <div class="header">
         <span class="col-name">Name</span>
+        <span class="col-chief">Chief</span>
         <span class="col-desc">Description</span>
         <span class="col-crew">Crew</span>
         <span class="col-status">Status</span>
@@ -37,10 +38,15 @@
     @for (mission of missions$ | async; track mission.id) {
     <div class="contents">
         <span class="col-name">{{mission.name}}</span>
+        <span class="col-chief">{{mission.chief_display_name}}</span>
         <span class="col-desc">{{mission.description}}</span>
         <span class="col-crew">
-            <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; vertical-align: middle; margin-right: 4px;">group</mat-icon>
-            {{mission.crew_count}}
+            <mat-icon
+                style="font-size: 1rem; width: 1rem; height: 1rem; vertical-align: middle; margin-right: 4px;">group</mat-icon>
+            {{mission.member_count || 0}} / {{mission.max_members}}
+            @if(mission.member_count >= mission.max_members) {
+            <span class="full-badge">FULL</span>
+            }
         </span>
         <span class="col-status">{{mission.status}}</span>
         <span class="col-created">{{mission.created_at | date:'M/d/yy'}}</span>
@@ -61,9 +67,10 @@
         </span>
     </div>
     } @empty {
-        <div style="padding: 3rem; text-align: center; color: #64748b;">
-            <mat-icon style="font-size: 3rem; width: 3rem; height: 3rem; margin-bottom: 1rem; opacity: 0.5;">search_off</mat-icon>
-            <p>No missions found matching your criteria.</p>
-        </div>
+    <div style="padding: 3rem; text-align: center; color: #64748b;">
+        <mat-icon
+            style="font-size: 3rem; width: 3rem; height: 3rem; margin-bottom: 1rem; opacity: 0.5;">search_off</mat-icon>
+        <p>No missions found matching your criteria.</p>
+    </div>
     }
 </div>

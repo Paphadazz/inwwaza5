@@ -50,15 +50,22 @@ impl MissionManagementRepository for MissionManagementPostgres {
     async fn remove(&self, mission_id: i32, chief_id: i32) -> Result<()> {
         let mut conn = Arc::clone(&self.db_pool).get()?;
 
-        update(missions::table)
+        let rows_affected = update(missions::table)
             .filter(missions::id.eq(mission_id))
+            .filter(missions::chief_id.eq(chief_id))
             .filter(missions::deleted_at.is_null())
-            .filter(missions::status.eq(MissionStatuses::Open.to_string()))
-            .set((
-                missions::deleted_at.eq(now),
-                missions::chief_id.eq(chief_id),
-            ))
-            .execute(&mut conn)?;
+            .set(missions::deleted_at.eq(now))
+            .execute(&mut conn).map_err(|e| {
+                tracing::error!("Database error during mission removal: {:?}", e);
+                e
+            })?;
+
+        if rows_affected == 0 {
+            tracing::warn!("No mission found to remove (id: {}, chief: {})", mission_id, chief_id);
+            return Err(anyhow::anyhow!("Mission not found or you are not the chief").into());
+        }
+
+        tracing::info!("Mission {} soft-deleted. Rows affected: {}", mission_id, rows_affected);
 
         Ok(())
     }

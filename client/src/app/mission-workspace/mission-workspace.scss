@@ -53,9 +53,22 @@
         display: grid;
         grid-template-columns: 1fr 360px;
         gap: 32px;
+        align-items: start;
 
         @media (max-width: 1024px) {
             grid-template-columns: 1fr;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
         mat-card {
@@ -133,153 +146,255 @@
                 }
             }
 
-            .settings-section {
-                margin-top: 40px;
-                padding-top: 32px;
-                border-top: 1px solid #f1f5f9;
+            // Removed Settings Section from Details Card
+            // .settings-section { ... }
 
-                h3 {
-                    margin-bottom: 20px;
-                    font-size: 1.125rem;
-                    font-weight: 700;
-                    color: #1e3a8a;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
+            h3 {
+                margin-bottom: 20px;
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: #1e3a8a;
+                display: flex;
+                align-items: center;
+                gap: 8px;
 
-                    mat-icon {
-                        color: #64748b;
-                    }
+                mat-icon {
+                    color: #64748b;
+                }
+            }
+
+            .settings-grid {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+
+                mat-form-field {
+                    width: 180px;
+                }
+            }
+        }
+    }
+
+    .tasks-card {
+        margin-top: 0;
+
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #94a3b8;
+
+            mat-icon {
+                font-size: 48px;
+                width: 48px;
+                height: 48px;
+                margin-bottom: 16px;
+            }
+        }
+
+        .task-item {
+            margin-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+
+        .task-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background-color: #e2e8f0;
+            color: #475569;
+
+            &.pending {
+                background-color: #fef9c3;
+                color: #854d0e;
+            }
+
+            &.inprogress {
+                background-color: #dbeafe;
+                color: #1e40af;
+            }
+
+            &.completed {
+                background-color: #dcfce7;
+                color: #166534;
+            }
+        }
+
+        .task-meta {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .priority-high,
+        .priority-critical {
+            color: #ef4444;
+        }
+
+        .priority-medium {
+            color: #f59e0b;
+        }
+
+        .priority-low {
+            color: #3b82f6;
+        }
+    }
+
+    .members-sidebar {
+        height: fit-content;
+
+        .members-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .count-badge {
+                background: #dbeafe;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 0.875rem;
+                font-weight: 700;
+                color: #1e40af;
+            }
+        }
+
+        mat-list {
+            padding: 8px 0;
+
+            div[mat-subheader] {
+                color: #94a3b8;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                padding: 16px 24px 8px;
+            }
+
+            mat-list-item {
+                height: auto !important;
+                min-height: 88px;
+                margin: 8px 12px;
+                padding: 12px 16px;
+                border-radius: 12px;
+                transition: all 0.2s ease;
+                border: 1px solid transparent;
+
+                &:hover {
+                    background: #f8fafc;
+                    border-color: #e2e8f0;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
                 }
 
-                .settings-grid {
-                    display: flex;
-                    align-items: center;
-                    gap: 24px;
+                img[matListItemAvatar] {
+                    width: 52px;
+                    height: 52px;
+                    border: 2px solid #e2e8f0;
+                    margin-right: 16px;
+                }
 
-                    mat-form-field {
-                        width: 180px;
+                .member-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    width: 100%;
+
+                    .member-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        span.member-name {
+                            font-weight: 700;
+                            color: #1e293b;
+                            font-size: 1.05rem;
+                        }
+                    }
+
+                    .member-badges {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        align-items: center;
+
+                        mat-chip-set {
+                            mat-chip {
+                                min-height: 24px;
+                                font-size: 0.75rem;
+                            }
+                        }
+
+                        .role-display {
+                            display: inline-flex;
+                            align-items: center;
+                            height: 26px;
+                            padding: 0 10px;
+                            background-color: #eff6ff;
+                            color: #1e40af;
+                            font-size: 0.8rem;
+                            font-weight: 600;
+                            border-radius: 6px;
+                            border: 1px solid #dbeafe;
+                        }
+
+                        button.role-select-btn {
+                            height: 26px;
+                            line-height: 26px;
+                            padding: 0 10px;
+                            font-size: 0.8rem;
+                            border: 1px solid #dbeafe;
+                            background: white;
+                            color: #1e40af;
+                            border-radius: 6px;
+
+                            &:hover {
+                                background: #eff6ff;
+                            }
+                        }
                     }
                 }
             }
         }
+    }
 
-        .members-sidebar {
-            height: fit-content;
-
-            .members-header {
-                width: 100%;
+    .settings-card {
+        mat-card-header {
+            mat-card-title {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
+                gap: 8px;
+                font-size: 1.125rem;
+                color: #1e3a8a;
 
-                .count-badge {
-                    background: #dbeafe;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.875rem;
-                    font-weight: 700;
-                    color: #1e40af;
+                mat-icon {
+                    color: #64748b;
                 }
             }
+        }
 
-            mat-list {
-                padding: 8px 0;
-
-                div[mat-subheader] {
-                    color: #94a3b8;
-                    font-weight: 700;
-                    letter-spacing: 0.05em;
-                    text-transform: uppercase;
-                    font-size: 0.75rem;
-                    padding: 16px 24px 8px;
-                }
-
-                mat-list-item {
-                    height: auto !important;
-                    min-height: 88px;
-                    margin: 8px 12px;
-                    padding: 12px 16px;
-                    border-radius: 12px;
-                    transition: all 0.2s ease;
-                    border: 1px solid transparent;
-
-                    &:hover {
-                        background: #f8fafc;
-                        border-color: #e2e8f0;
-                        transform: translateY(-1px);
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-                    }
-
-                    img[matListItemAvatar] {
-                        width: 52px;
-                        height: 52px;
-                        border: 2px solid #e2e8f0;
-                        margin-right: 16px;
-                    }
-
-                    .member-content {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 8px;
-                        width: 100%;
-
-                        .member-header {
-                            display: flex;
-                            align-items: center;
-                            gap: 8px;
-
-                            span.member-name {
-                                font-weight: 700;
-                                color: #1e293b;
-                                font-size: 1.05rem;
-                            }
-                        }
-
-                        .member-badges {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 8px;
-                            align-items: center;
-
-                            mat-chip-set {
-                                mat-chip {
-                                    min-height: 24px;
-                                    font-size: 0.75rem;
-                                }
-                            }
-
-                            .role-display {
-                                display: inline-flex;
-                                align-items: center;
-                                height: 26px;
-                                padding: 0 10px;
-                                background-color: #eff6ff;
-                                color: #1e40af;
-                                font-size: 0.8rem;
-                                font-weight: 600;
-                                border-radius: 6px;
-                                border: 1px solid #dbeafe;
-                            }
-
-                            button.role-select-btn {
-                                height: 26px;
-                                line-height: 26px;
-                                padding: 0 10px;
-                                font-size: 0.8rem;
-                                border: 1px solid #dbeafe;
-                                background: white;
-                                color: #1e40af;
-                                border-radius: 6px;
-
-                                &:hover {
-                                    background: #eff6ff;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        .full-width {
+            width: 100%;
         }
     }
 }

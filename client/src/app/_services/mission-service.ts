@@ -1,5 +1,5 @@
 ﻿import { inject, Injectable } from '@angular/core'
-import { environment } from '../../environments/environment'      
+import { environment } from '../../environments/environment'
 import { HttpClient } from '@angular/common/http'
 import { MissionFilter } from '../_models/mission-filter'
 import { firstValueFrom } from 'rxjs'
@@ -16,16 +16,16 @@ export class MissionService {
 
   filter: MissionFilter = {}
 
-  async getByFilter(filter: MissionFilter): Promise<Mission[]> {  
+  async getByFilter(filter: MissionFilter): Promise<Mission[]> {
     const queryString = this.createQueryString(filter)
-    const url = this._api_url + '/view/filter?' + queryString     
+    const url = this._api_url + '/view/filter?' + queryString
     const missions = await firstValueFrom(this._http.get<Mission[]>(url))
     return missions
   }
 
   async getById(id: number): Promise<Mission> {
     const url = this._api_url + '/view/' + id
-    return await firstValueFrom(this._http.get<Mission>(url))     
+    return await firstValueFrom(this._http.get<Mission>(url))
   }
 
   async getMyMissions(): Promise<Mission[]> {
@@ -42,13 +42,13 @@ export class MissionService {
     return resp.mission_id
   }
 
-  async update(id: number, mission: EditMission): Promise<void> { 
-    const url = this._api_url + '/mission-management/' + id       
+  async update(id: number, mission: EditMission): Promise<void> {
+    const url = this._api_url + '/mission-management/' + id
     await firstValueFrom(this._http.patch(url, mission))
   }
 
   async delete(id: number): Promise<void> {
-    const url = this._api_url + '/mission-management/' + id       
+    const url = this._api_url + '/mission-management/' + id
     await firstValueFrom(this._http.delete(url))
   }
 
@@ -64,7 +64,7 @@ export class MissionService {
 
   async getCrew(missionId: number): Promise<any[]> {
     const url = this._api_url + '/view/crew/' + missionId
-    return await firstValueFrom(this._http.get<any[]>(url))       
+    return await firstValueFrom(this._http.get<any[]>(url))
   }
 
   async getWorkspaceMembers(missionId: number): Promise<{ members: any[], count: number, max_count: number }> {
@@ -89,7 +89,7 @@ export class MissionService {
 
   async getJoined(): Promise<Mission[]> {
     const url = `${this._api_url}/v1/missions/joined`;
-    return await firstValueFrom(this._http.get<Mission[]>(url));  
+    return await firstValueFrom(this._http.get<Mission[]>(url));
   }
 
   async updateMemberRole(missionId: number, brawlerId: number, role: String): Promise<void> {
@@ -97,7 +97,33 @@ export class MissionService {
     await firstValueFrom(this._http.post(url, { role }))
   }
 
-  private createQueryString(filter: MissionFilter): string {      
+  async kickMember(missionId: number, brawlerId: number): Promise<void> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/members/' + brawlerId + '/kick'
+    await firstValueFrom(this._http.delete(url))
+  }
+
+  // Task Management
+  async getTasks(missionId: number): Promise<any[]> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/tasks'
+    return await firstValueFrom(this._http.get<any[]>(url))
+  }
+
+  async createTask(missionId: number, task: any): Promise<any> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/tasks'
+    return await firstValueFrom(this._http.post<any>(url, task))
+  }
+
+  async updateTask(missionId: number, taskId: number, task: any): Promise<any> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/tasks/' + taskId
+    return await firstValueFrom(this._http.patch<any>(url, task))
+  }
+
+  async deleteTask(missionId: number, taskId: number): Promise<void> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/tasks/' + taskId
+    await firstValueFrom(this._http.delete(url))
+  }
+
+  private createQueryString(filter: MissionFilter): string {
     this.filter = filter
     const params: string[] = []
 

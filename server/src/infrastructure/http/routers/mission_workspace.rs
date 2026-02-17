@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{delete, get, post},
+    routing::{delete, get, patch, post},
     Extension, Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -22,6 +22,7 @@ use crate::{
             repositories::{
                 crew_operation::CrewOperationPostgres,
                 mission_viewing::MissionViewingPostgres,
+                tasks::TaskPostgres,
             },
         },
         http::middlewares::auth::authorization,
@@ -49,6 +50,7 @@ pub struct WorkspaceState {
     pub crew_case: Arc<CrewOperationUseCase<CrewOperationPostgres, MissionViewingPostgres>>,
     pub view_case: Arc<MissionViewingUseCase<MissionViewingPostgres>>,
     pub management_case: Arc<crate::application::use_cases::mission_management::MissionManagementUseCase<crate::infrastructure::database::repositories::mission_management::MissionManagementPostgres, crate::infrastructure::database::repositories::mission_viewing::MissionViewingPostgres>>,
+    pub task_case: Arc<crate::application::use_cases::tasks::TaskUseCase<TaskPostgres, MissionViewingPostgres>>,
 }
 
 pub type AppState = Arc<WorkspaceState>;
@@ -93,6 +95,17 @@ pub async fn update_member_role(
 ) -> impl IntoResponse {
     match state.crew_case.update_role(mission_id, brawler_id, payload.role, user_id).await {
         Ok(_) => (StatusCode::OK, Json(serde_json::json!({ "message": "Role updated successfully" }))).into_response(),
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
+}
+
+pub async fn kick_member(
+    State(state): State<AppState>,
+    Extension(user_id): Extension<i32>,
+    Path((mission_id, brawler_id)): Path<(i32, i32)>,
+) -> impl IntoResponse {
+    match state.crew_case.kick(mission_id, brawler_id, user_id).await {
+        Ok(_) => (StatusCode::OK, Json(serde_json::json!({ "message": "Member kicked successfully" }))).into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
@@ -142,6 +155,12 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         Arc::clone(&crew_repo),
         Arc::clone(&view_repo),
     ));
+
+    let task_repo = Arc::new(TaskPostgres::new(Arc::clone(&db_pool)));
+    let task_case = Arc::new(crate::application::use_cases::tasks::TaskUseCase::new(
+        Arc::clone(&task_repo),
+        Arc::clone(&view_repo),
+    ));
     
     let view_case = Arc::new(MissionViewingUseCase::new(Arc::clone(&view_repo)));
 
@@ -155,6 +174,7 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         crew_case,
         view_case,
         management_case,
+        task_case,
     });
 
     Router::new()
@@ -163,7 +183,11 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         .route("/{mission_id}/leave", delete(leave))
         .route("/{mission_id}/members", get(get_members))
         .route("/{mission_id}/members/{brawler_id}/role", post(update_member_role))
-        .route("/{mission_id}/settings", post(update_settings))   
-        .route_layer(axum::middleware::from_fn(authorization))    
+        .route("/{mission_id}/members/{brawler_id}/kick", delete(kick_member))
+        .route("/{mission_id}/settings", post(update_settings))
+        // Task Routes
+        .route("/{mission_id}/tasks", get(crate::infrastructure::http::routers::tasks::get_tasks).post(crate::infrastructure::http::routers::tasks::create_task))
+        .route("/{mission_id}/tasks/{task_id}", patch(crate::infrastructure::http::routers::tasks::update_task).delete(crate::infrastructure::http::routers::tasks::delete_task))
+        .route_layer(axum::middleware::from_fn(authorization))
         .with_state(state)
 }

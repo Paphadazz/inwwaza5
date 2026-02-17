@@ -97,7 +97,7 @@ impl BrawlerRepository for BrawlerPostgres {
         Ok(uploaded_img)
     }
 
-    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+    async fn member_counting(&self, mission_id: i32) -> Result<u32> {
         let mut connection = Arc::clone(&self.db_pool).get()?;
 
         let count: i64 = crew_memberships::table
@@ -113,6 +113,7 @@ impl BrawlerRepository for BrawlerPostgres {
 
         let result = missions::table
             .filter(missions::chief_id.eq(brawler_id))
+            .filter(missions::deleted_at.is_null())
             .select(MissionEntity::as_select())
             .load::<MissionEntity>(&mut connection)?;
 

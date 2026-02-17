@@ -26,7 +26,7 @@ impl MissionViewingPostgres {
 
 #[async_trait]
 impl MissionViewingRepository for MissionViewingPostgres {
-    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+    async fn member_counting(&self, mission_id: i32) -> Result<u32> {
         let mut conn = Arc::clone(&self.db_pool).get()?;
 
         let value = crew_memberships::table
@@ -44,7 +44,7 @@ impl MissionViewingRepository for MissionViewingPostgres {
         let sql = r#"
             SELECT m.id, m.name, m.description, m.status, m.chief_id, 
                    b.display_name AS chief_display_name,
-                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS crew_count,
+                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS member_count,
                    m.max_members,
                    m.created_at, m.updated_at,
                    EXISTS (SELECT 1 FROM crew_memberships cm2 WHERE cm2.mission_id = m.id AND cm2.brawler_id = $2) AS is_joined
@@ -70,7 +70,7 @@ impl MissionViewingRepository for MissionViewingPostgres {
         let sql = r#"
             SELECT m.id, m.name, m.description, m.status, m.chief_id, 
                    b.display_name AS chief_display_name,
-                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS crew_count,
+                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS member_count,
                    m.max_members,
                    m.created_at, m.updated_at,
                    EXISTS (SELECT 1 FROM crew_memberships cm2 WHERE cm2.mission_id = m.id AND cm2.brawler_id = $3) AS is_joined
@@ -135,7 +135,7 @@ impl MissionViewingRepository for MissionViewingPostgres {
         let sql = r#"
             SELECT m.id, m.name, m.description, m.status, m.chief_id,
                    b.display_name AS chief_display_name,
-                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS crew_count,
+                   (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS member_count,
                    m.max_members,
                    m.created_at, m.updated_at,
                    true AS is_joined

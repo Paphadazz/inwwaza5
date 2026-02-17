@@ -9,7 +9,8 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     border: 1px solid #e2e8f0;
 
-    .search-group, .filter-group {
+    .search-group,
+    .filter-group {
         position: relative;
         display: flex;
         align-items: center;
@@ -24,7 +25,8 @@
             height: 1.25rem;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 0.75rem 1rem 0.75rem 2.75rem;
             border: 1px solid #e2e8f0;
@@ -81,7 +83,7 @@
     .header,
     .contents {
         display: grid;
-        grid-template-columns: 1.5fr 2fr 0.8fr 1fr 1fr 1fr 1.2fr;
+        grid-template-columns: 1.2fr 1fr 1.8fr 0.8fr 0.8fr 1fr 1fr 1fr;
         padding: 1.25rem 1.5rem;
         align-items: center;
         border-bottom: 1px solid #f1f5f9;
@@ -122,6 +124,12 @@
         color: #1e3a8a;
     }
 
+    .col-chief {
+        font-weight: 500;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
     .col-status {
         font-weight: 600;
         display: inline-flex;
@@ -141,19 +149,29 @@
     }
 
     @media (max-width: 1024px) {
-        .header, .contents {
-            grid-template-columns: 1.5fr 2fr 0.8fr 1fr 1.2fr;
+
+        .header,
+        .contents {
+            grid-template-columns: 1.2fr 1fr 1.5fr 0.8fr 1fr 1fr;
         }
-        .col-created, .col-updated {
+
+        .col-desc,
+        .col-created,
+        .col-updated {
             display: none;
         }
     }
 
     @media (max-width: 768px) {
-        .header, .contents {
-            grid-template-columns: 1fr 1.5fr 1fr;
+
+        .header,
+        .contents {
+            grid-template-columns: 1fr 1fr 1fr;
         }
-        .col-crew, .col-status {
+
+        .col-chief,
+        .col-crew,
+        .col-status {
             display: none;
         }
     }
@@ -198,4 +216,17 @@
     background: #f1f5f9;
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
+}
+
+.full-badge {
+    background: #fef2f2;
+    color: #ef4444;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    border: 1px solid #fee2e2;
+    margin-left: 4px;
+    vertical-align: middle;
+    text-transform: uppercase;
 }

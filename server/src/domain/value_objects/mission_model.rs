@@ -25,7 +25,7 @@ pub struct MissionModel {
     #[diesel(sql_type = Varchar)]
     pub chief_display_name: String,
     #[diesel(sql_type = BigInt)]
-    pub crew_count: i64,
+    pub member_count: i64,
     #[diesel(sql_type = Int4)]
     pub max_members: i32,
     #[diesel(sql_type = Timestamp)]

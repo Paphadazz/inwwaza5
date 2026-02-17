@@ -43,9 +43,9 @@ where
             ));
         }
 
-        let crew_count = self
+        let member_count = self
             .mission_viewing_repository
-            .crew_counting(mission_id)
+            .member_counting(mission_id)
             .await?;
 
         let mission_status_condition = mission.status == MissionStatuses::Open.to_string()
@@ -53,8 +53,8 @@ where
         if !mission_status_condition {
             return Err(anyhow::anyhow!("Mission is not joinable"));
         }
-        let crew_count_condition = (crew_count as i32) < mission.max_members;
-        if !crew_count_condition {
+        let member_count_condition = (member_count as i32) < mission.max_members;
+        if !member_count_condition {
             return Err(anyhow::anyhow!("Mission is full"));
         }
 
@@ -104,6 +104,29 @@ where
         }
 
         self.crew_operation_repository.update_role(mission_id, brawler_id, role).await?;
+        Ok(())
+    }
+
+    pub async fn kick(&self, mission_id: i32, brawler_id: i32, chief_id: i32) -> Result<()> {
+        let mission = self.mission_viewing_repository.view_detail(mission_id, None).await?;
+        
+        if mission.chief_id != chief_id {
+            return Err(anyhow::anyhow!("Only the Chief can kick members"));
+        }
+
+        if mission.chief_id == brawler_id {
+            return Err(anyhow::anyhow!("The Chief cannot kick themselves"));
+        }
+
+        self.crew_operation_repository
+            .leave(CrewMemberShips {
+                mission_id,
+                brawler_id,
+                joined_at: Local::now().naive_local(),
+                role: "".to_string(),
+            })
+            .await?;
+
         Ok(())
     }
 }

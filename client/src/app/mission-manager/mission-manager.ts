@@ -29,7 +29,7 @@ import { EditMission } from '../_models/edit-mission';
 export class MissionManager {
   private _missionService = inject(MissionService)
   private _dialog = inject(MatDialog)
-  private _passportService = inject(PassportService)
+  public passportService = inject(PassportService)
   private _snackBar = inject(MatSnackBar)
   private _router = inject(Router)
 
@@ -51,7 +51,7 @@ export class MissionManager {
   }
 
   readonly ownMissions$ = this._missionsSubject.asObservable().pipe(
-    map(missions => missions.filter(m => m.chief_id === this._passportService.data()?.id))
+    map(missions => missions.filter(m => m.chief_id === this.passportService.data()?.id))
   )
 
   openDialog() {
@@ -67,9 +67,9 @@ export class MissionManager {
           name: addMission.name,
           description: addMission.description,
           status: addMission.status ?? 'Open',
-          chief_id: this._passportService.data()?.id ?? 0,
-          chief_display_name: this._passportService.data()?.display_name ?? 'Unknown',
-          crew_count: 0,
+          chief_id: this.passportService.data()?.id ?? 0,
+          chief_display_name: this.passportService.data()?.display_name ?? 'Unknown',
+          member_count: 0,
           max_members: addMission.max_members ?? 10,
           created_at: now,
           updated_at: now,
@@ -118,8 +118,13 @@ export class MissionManager {
         await this._missionService.delete(id)
         const currentMissions = this._missionsSubject.value
         this._missionsSubject.next(currentMissions.filter(m => m.id !== id))
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to delete mission', err)
+        let errorMessage = 'Failed to delete mission';
+        if (err.error) {
+          errorMessage = typeof err.error === 'string' ? err.error : (err.error.message || JSON.stringify(err.error));
+        }
+        this._snackBar.open(errorMessage, 'Close', { duration: 5000 });
       }
     }
   }

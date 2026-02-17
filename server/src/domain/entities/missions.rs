@@ -21,7 +21,7 @@ pub struct MissionEntity {
 }
 
 impl MissionEntity {
-    pub fn to_model(&self, chief_display_name: String, crew_count: i64) -> MissionModel {
+    pub fn to_model(&self, chief_display_name: String, member_count: i64) -> MissionModel {
         MissionModel {
             id: self.id,
             name: self.name.clone(),
@@ -29,7 +29,7 @@ impl MissionEntity {
             status: self.status.clone(),
             chief_id: self.chief_id,
             chief_display_name,
-            crew_count,
+            member_count,
             max_members: self.max_members,
             created_at: self.created_at,
             updated_at: self.updated_at,

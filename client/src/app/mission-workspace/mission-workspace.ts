@@ -16,6 +16,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
+import { NewTask } from '../_dialogs/new-task/new-task';
 
 @Component({
     selector: 'app-mission-workspace',
@@ -45,10 +47,12 @@ export class MissionWorkspace implements OnInit {
     private _missionService = inject(MissionService);
     private _passportService = inject(PassportService);
     private _snackBar = inject(MatSnackBar);
+    private _dialog = inject(MatDialog);
 
     missionId = signal<number>(0);
     mission = signal<Mission | null>(null);
     members = signal<any[]>([]);
+    tasks = signal<any[]>([]);
     memberCount = signal<number>(0);
     maxMemberCount = signal<number>(0);
     currentUserId = signal<number | undefined>(undefined);
@@ -77,9 +81,20 @@ export class MissionWorkspace implements OnInit {
             const mission = await this._missionService.getById(this.missionId());
             this.mission.set(mission);
             this.isUserChief.set(mission.chief_id === this.currentUserId());
+
+            await this.loadTasks();
         } catch (e) {
             console.error(e);
             this._snackBar.open('Error loading workspace data', 'Close', { duration: 3000 });
+        }
+    }
+
+    async loadTasks() {
+        try {
+            const tasks = await this._missionService.getTasks(this.missionId());
+            this.tasks.set(tasks);
+        } catch (e) {
+            console.error('Error loading tasks', e);
         }
     }
 
@@ -124,6 +139,49 @@ export class MissionWorkspace implements OnInit {
 
     isCurrentUser(member: any): boolean {
         return member.id === this.currentUserId();
+    }
+
+    async kickMember(memberId: number) {
+        if (!confirm('Are you sure you want to remove this member?')) return;
+        try {
+            await this._missionService.kickMember(this.missionId(), memberId);
+            this._snackBar.open('Member removed', 'Close', { duration: 2000 });
+            await this.loadData();
+        } catch (e) {
+            console.error(e);
+            this._snackBar.open('Error removing member', 'Close', { duration: 3000 });
+        }
+    }
+
+    createTask() {
+        const ref = this._dialog.open(NewTask, {
+            data: { members: this.members() }
+        });
+
+        ref.afterClosed().subscribe(async (result) => {
+            if (result) {
+                try {
+                    await this._missionService.createTask(this.missionId(), result);
+                    this._snackBar.open('Task created', 'Close', { duration: 2000 });
+                    await this.loadTasks();
+                } catch (e) {
+                    console.error(e);
+                    this._snackBar.open('Error creating task', 'Close', { duration: 3000 });
+                }
+            }
+        });
+    }
+
+    async deleteTask(taskId: number) {
+        if (!confirm('Delete this task?')) return;
+        try {
+            await this._missionService.deleteTask(this.missionId(), taskId);
+            this._snackBar.open('Task deleted', 'Close', { duration: 2000 });
+            await this.loadTasks();
+        } catch (e) {
+            console.error(e);
+            this._snackBar.open('Error deleting task', 'Close', { duration: 3000 });
+        }
     }
 
     navigateToDashboard() {

@@ -82,7 +82,7 @@ where
     match user_case.remove(mission_id, user_id).await {
         Ok(_) => (
             StatusCode::OK,
-            format!("Remove mission_id: {} completed!!", mission_id),
+            Json(serde_json::json!({ "message": format!("Remove mission_id: {} completed!!", mission_id) })),
         )
             .into_response(),
 

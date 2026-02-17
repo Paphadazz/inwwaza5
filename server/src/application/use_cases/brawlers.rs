@@ -68,8 +68,8 @@ where
 
         let mut mission_models = Vec::new();
         for mission in missions {
-            let crew_count = self.brawler_repository.crew_counting(mission.id).await?;
-            mission_models.push(mission.to_model(brawler.display_name.clone(), crew_count as i64));
+            let member_count = self.brawler_repository.member_counting(mission.id).await?;
+            mission_models.push(mission.to_model(brawler.display_name.clone(), member_count as i64));
         }
 
         Ok(mission_models)

@@ -97,19 +97,12 @@ where
     }
 
     pub async fn remove(&self, mission_id: i32, chief_id: i32) -> Result<()> {
-        let crew_count = self
-            .mission_viewing_repository
-            .crew_counting(mission_id)
-            .await?;
-        if crew_count > 0 {
-            return Err(anyhow::anyhow!(
-                "Mission has been taken by brawler for now!"
-            ));
+        tracing::info!("Attempting to remove mission {} by chief {}", mission_id, chief_id);
+        if let Err(e) = self.mission_management_repository.remove(mission_id, chief_id).await {
+            tracing::error!("Failed to remove mission {}: {:?}", mission_id, e);
+            return Err(e);
         }
-
-        self.mission_management_repository
-            .remove(mission_id, chief_id)
-            .await?;
+        tracing::info!("Successfully removed mission {}", mission_id);
         Ok(())
     }
 }

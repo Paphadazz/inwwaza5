@@ -4,4 +4,5 @@ pub mod dashboard;
 pub mod mission_management;
 pub mod mission_operation;
 pub mod mission_viewing;
+pub mod tasks;
 // pub mod transaction_provider;

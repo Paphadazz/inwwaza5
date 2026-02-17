@@ -24,14 +24,19 @@
                 <div class="mission-stats">
                     <div class="stat">
                         <mat-icon>group</mat-icon>
-                        <span>{{mission.crew_count}} / {{mission.max_members}}</span>
+                        <span>{{mission.member_count || 0}} / {{mission.max_members}}</span>
                     </div>
                     <div class="stat">
                         <mat-icon>access_time</mat-icon>
                         <span>{{mission.updated_at | date:'M/d/yy'}}</span>
                     </div>
                 </div>
+                @if (mission.chief_id === (passportService.data()?.id)) {
                 <div class="card-actions">
+                    <button mat-icon-button color="accent" (click)="navigateToWorkspace(mission.id)"
+                        title="Enter Mission Control">
+                        <mat-icon>login</mat-icon>
+                    </button>
                     <button mat-icon-button color="primary" (click)="editMission(mission)" title="Edit">
                         <mat-icon>edit</mat-icon>
                     </button>
@@ -39,6 +44,7 @@
                         <mat-icon>delete</mat-icon>
                     </button>
                 </div>
+                }
             </div>
             }
         </div>

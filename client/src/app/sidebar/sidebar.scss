@@ -22,13 +22,10 @@
   .sidebar-item {
     margin: 6px 12px;
     height: 48px;
-    background: transparent !important; // Background unchanged in all states
     border-radius: 8px;
     transition: all 0.2s ease;
-
-    // Default State: Text and Icon color = white
     color: white !important;
-    
+
     mat-icon {
       color: white !important;
       margin-right: 12px;
@@ -40,24 +37,24 @@
       transition: color 0.2s ease;
     }
 
-    &:hover:not(.active-text) {
-      background-color: rgb(255, 254, 254) !important;
+    &:hover {
+      background-color: #ffffff !important;
+      color: #1e3a8a !important;
+
+      mat-icon,
+      [matListItemTitle] {
+        color: #1e3a8a !important;
+      }
     }
 
-    // Active Route: Text and Icon color = black, Background = unchanged
     &.active-text {
-      background: transparent !important;
-      
-      mat-icon {
-        color: black !important;
-      }
+      background-color: #e0f2fe !important; // Light blue (Sky 100)
+      color: #1e3a8a !important;
 
+      mat-icon,
       [matListItemTitle] {
-        color: black !important;
+        color: #1e3a8a !important;
       }
-
-      // Ensure text color is black even if nested deep
-      color: black !important;
     }
   }
 }
@@ -65,6 +62,7 @@
 @media (max-width: 768px) {
   .sidebar {
     left: -260px;
+
     &.collapsed {
       left: 0;
       width: 260px;

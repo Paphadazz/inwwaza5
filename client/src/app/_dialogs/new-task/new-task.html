@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Create New Task</h2>
+<mat-dialog-content>
+    <div class="form-container">
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Task Title</mat-label>
+            <input matInput [(ngModel)]="task.title" placeholder="Enter task title" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput [(ngModel)]="task.description" placeholder="Task details..." rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="row">
+            <mat-form-field appearance="fill">
+                <mat-label>Assign To</mat-label>
+                <mat-select [(ngModel)]="task.member_id">
+                    <mat-option [value]="null">Unassigned</mat-option>
+                    <mat-option *ngFor="let m of members" [value]="m.id">
+                        {{m.display_name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Priority</mat-label>
+                <mat-select [(ngModel)]="task.priority">
+                    <mat-option value="Low">Low</mat-option>
+                    <mat-option value="Medium">Medium</mat-option>
+                    <mat-option value="High">High</mat-option>
+                    <mat-option value="Critical">Critical</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <!-- <div class="row">
+            <mat-form-field appearance="fill">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="startPicker" [(ngModel)]="task.start_date">
+                <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Due Date</mat-label>
+                <input matInput [matDatepicker]="endPicker" [(ngModel)]="task.end_date">
+                <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+        </div> -->
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!task.title">Create Task</button>
+</mat-dialog-actions>

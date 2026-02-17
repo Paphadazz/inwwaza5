@@ -22,7 +22,7 @@ pub trait BrawlerRepository {
         base64img: Base64Img,
         opt: UploadImageOptions,
     ) -> Result<UploadedImg>;
-    async fn crew_counting(&self, mission_id: i32) -> Result<u32>;
+    async fn member_counting(&self, mission_id: i32) -> Result<u32>;
     async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionEntity>>;
     async fn update_profile(&self, brawler_id: i32, model: UpdateBrawlerModel) -> Result<()>;
 }

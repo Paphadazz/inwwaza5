@@ -32,9 +32,9 @@ where
     pub async fn in_progress(&self, mission_id: i32, chief_id: i32) -> Result<i32> {
         let mission = self.mission_viewing_repository.view_detail(mission_id, Some(chief_id)).await?;
 
-        let crew_count = self
+        let member_count = self
             .mission_viewing_repository
-            .crew_counting(mission_id)
+            .member_counting(mission_id)
             .await?;
 
         let is_status_open_or_fail = mission.status == MissionStatuses::Open.to_string()
@@ -45,8 +45,8 @@ where
             .parse()?;
 
         let update_condition = is_status_open_or_fail
-            && crew_count > 0
-            && crew_count < max_crew_per_mission
+            && member_count > 0
+            && member_count < max_crew_per_mission
             && mission.chief_id == chief_id;
         if !update_condition {
             return Err(anyhow::anyhow!("Invalid condition to change stages!"));

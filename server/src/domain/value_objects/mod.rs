@@ -4,4 +4,5 @@ pub mod mission_filter;
 pub mod mission_model;
 pub mod mission_statuses;
 pub mod uploaded_img;
+pub mod task_model;
 pub mod dashboard_model;
