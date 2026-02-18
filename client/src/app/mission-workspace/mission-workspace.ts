@@ -18,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { NewTask } from '../_dialogs/new-task/new-task';
+import { ViewSubmissionDialog } from '../_dialogs/view-submission/view-submission';
+import { SquadSettings } from '../_dialogs/squad-settings/squad-settings';
 
 @Component({
     selector: 'app-mission-workspace',
@@ -57,6 +59,7 @@ export class MissionWorkspace implements OnInit {
     maxMemberCount = signal<number>(0);
     currentUserId = signal<number | undefined>(undefined);
     isUserChief = signal<boolean>(false);
+    isSubmitting = signal<boolean>(false);
 
     availableRoles = ['Member', 'Tactician', 'Combatant', 'Support', 'Sniper', 'Tank', 'Healer'];
 
@@ -98,6 +101,29 @@ export class MissionWorkspace implements OnInit {
         }
     }
 
+    async openSquadSettings() {
+        const m = this.mission();
+        if (!m) return;
+
+        const ref = this._dialog.open(SquadSettings, {
+            width: '350px',
+            data: { max_members: m.max_members }
+        });
+
+        ref.afterClosed().subscribe(async (result) => {
+            if (result) {
+                try {
+                    await this._missionService.updateSettings(this.missionId(), result);
+                    this._snackBar.open('Squad configuration updated', 'Close', { duration: 2000 });
+                    await this.loadData();
+                } catch (e) {
+                    console.error(e);
+                    this._snackBar.open('Error updating squad settings', 'Close', { duration: 3000 });
+                }
+            }
+        });
+    }
+
     async leave() {
         try {
             await this._missionService.leaveV1(this.missionId());
@@ -106,19 +132,6 @@ export class MissionWorkspace implements OnInit {
         } catch (e) {
             console.error(e);
             this._snackBar.open('Error leaving mission', 'Close', { duration: 3000 });
-        }
-    }
-
-    async updateMaxMembers(newMax: string) {
-        const val = parseInt(newMax);
-        if (isNaN(val) || val < 1) return;
-        try {
-            await this._missionService.updateSettings(this.missionId(), { max_members: val });
-            this._snackBar.open('Max members updated', 'Close', { duration: 2000 });
-            await this.loadData();
-        } catch (e) {
-            console.error(e);
-            this._snackBar.open('Error updating team size', 'Close', { duration: 3000 });
         }
     }
 
@@ -182,6 +195,85 @@ export class MissionWorkspace implements OnInit {
             console.error(e);
             this._snackBar.open('Error deleting task', 'Close', { duration: 3000 });
         }
+    }
+
+    selectedTaskId: number | null = null;
+
+    triggerFileInput(taskId?: number) {
+        this.selectedTaskId = taskId || null;
+        const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+        fileInput.click();
+    }
+
+    async onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        if (file) {
+            this.isSubmitting.set(true);
+            try {
+                await this._missionService.submitWork(this.missionId(), file, this.selectedTaskId || undefined);
+                this._snackBar.open('Work submitted successfully', 'Close', { duration: 3000 });
+                await this.loadTasks(); // Refresh tasks to show status if affected
+            } catch (e) {
+                console.error(e);
+                this._snackBar.open('Error submitting work', 'Close', { duration: 3000 });
+            } finally {
+                this.isSubmitting.set(false);
+                this.selectedTaskId = null;
+                // Reset file input
+                event.target.value = '';
+            }
+        }
+    }
+
+    async viewSubmission(taskId: number) {
+        const task = this.tasks().find(t => t.id === taskId);
+        if (task && task.member_id) {
+            this._router.navigate(['/missions', this.missionId(), 'evidence'], {
+                queryParams: { member: task.member_id, task: taskId }
+            });
+        } else {
+            this.goToEvidence();
+        }
+    }
+
+    async deleteSubmission(taskId: number) {
+        const task = this.tasks().find(t => t.id === taskId);
+        if (!task) return;
+
+        if (!confirm('Retract this submission and delete the file?')) return;
+
+        try {
+            const submission = await this._missionService.getTaskSubmission(this.missionId(), taskId);
+            if (submission) {
+                await this._missionService.deleteSubmission(this.missionId(), submission.id);
+                this._snackBar.open('Submission retracted successfully', 'Close', { duration: 3000 });
+                await this.loadTasks();
+            }
+        } catch (e) {
+            console.error(e);
+            this._snackBar.open('Error retracting submission', 'Close', { duration: 3000 });
+        }
+    }
+
+    async updateTaskStatus(taskId: number, newStatus: string) {
+        try {
+            await this._missionService.updateTask(this.missionId(), taskId, { status: newStatus });
+            this._snackBar.open(`Task status updated to ${newStatus}`, 'Close', { duration: 2000 });
+            await this.loadTasks();
+        } catch (e) {
+            console.error(e);
+            this._snackBar.open('Error updating task status', 'Close', { duration: 3000 });
+        }
+    }
+
+    viewMemberEvidence(member: any) {
+        this._router.navigate(['/missions', this.missionId(), 'evidence'], {
+            queryParams: { member: member.id }
+        });
+    }
+
+    goToEvidence() {
+        this._router.navigate(['/missions', this.missionId(), 'evidence']);
     }
 
     navigateToDashboard() {

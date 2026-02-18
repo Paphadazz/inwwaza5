@@ -16,7 +16,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--loading-overlay-bg);
     backdrop-filter: blur(4px);
     z-index: 100;
 }
@@ -79,13 +79,13 @@
     .section-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-heading-alt);
         display: flex;
         align-items: center;
         gap: 8px;
 
         mat-icon {
-            color: #3b82f6;
+            color: var(--accent-blue);
         }
     }
 }
@@ -108,12 +108,13 @@
     .mission-item-card {
         border-radius: 16px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
 
         &:hover {
             transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border-color: #3b82f6;
+            box-shadow: var(--card-shadow);
+            border-color: var(--accent-blue);
         }
 
         mat-card-content {
@@ -130,7 +131,7 @@
 
             .mission-name {
                 font-weight: 600;
-                color: #1a237e;
+                color: var(--text-heading);
                 font-size: 1.1rem;
             }
         }
@@ -139,8 +140,8 @@
             font-size: 0.75rem;
             padding: 2px 8px;
             border-radius: 12px;
-            background: #f1f5f9;
-            color: #64748b;
+            background: var(--bg-secondary);
+            color: var(--text-muted);
             width: fit-content;
 
             &.open {
@@ -161,12 +162,12 @@
     }
 
     .empty-list-note {
-        background: #f8fafc;
-        border: 2px dashed #e2e8f0;
+        background: var(--bg-secondary);
+        border: 2px dashed var(--border-color);
         border-radius: 16px;
         padding: 3rem;
         text-align: center;
-        color: #64748b;
+        color: var(--text-muted);
 
         p {
             margin-bottom: 1.5rem;
@@ -210,6 +211,8 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
 
         mat-card-header {
             padding: 1.5rem 1.5rem 0.5rem;
@@ -219,7 +222,7 @@
             mat-card-title {
                 font-size: 1.2rem;
                 font-weight: 700;
-                color: #1e293b;
+                color: var(--text-heading-alt);
                 margin: 0;
             }
 
@@ -230,6 +233,10 @@
                 padding: 2px 8px;
                 border-radius: 4px;
                 font-weight: 600;
+
+                &.joined {
+                    background: #10b981;
+                }
             }
         }
 
@@ -238,7 +245,7 @@
             flex-grow: 1;
 
             .description {
-                color: #64748b;
+                color: var(--text-muted);
                 font-size: 0.9rem;
                 line-height: 1.5;
                 margin: 0;
@@ -247,7 +254,7 @@
 
         mat-card-actions {
             padding: 1rem 1.5rem;
-            border-top: 1px dotted #e2e8f0;
+            border-top: 1px dotted var(--border-color);
 
             button {
                 width: 100%;

@@ -35,13 +35,13 @@
               <span class="mission-name">{{ mission.name }}</span>
               <span class="mission-status-badge" [class]="mission.status.toLowerCase()">{{ mission.status }}</span>
             </div>
-            <button mat-button color="primary" (click)="onViewMission(mission.id)">View Mission</button>
+            <button mat-button color="primary" (click)="onViewMission(mission.id)">Open Workspace</button>
           </mat-card-content>
         </mat-card>
         }
         } @else {
         <div class="empty-list-note">
-          <p>You haven't joined any missions yet.</p>
+          <p>You haven't joined or created any active missions yet.</p>
           <button mat-flat-button color="accent" (click)="onBrowseAll()">Find a Mission</button>
         </div>
         }
@@ -74,13 +74,21 @@
         <mat-card class="featured-card" appearance="outlined">
           <mat-card-header>
             <mat-card-title>{{ mission.name }}</mat-card-title>
-            <span class="status-tag">Open</span>
+            <span class="status-tag" [class]="mission.is_joined ? 'joined' : 'open'">
+              {{ mission.is_joined ? 'Joined' : mission.status }}
+            </span>
           </mat-card-header>
           <mat-card-content>
             <p class="description">{{ mission.description }}</p>
           </mat-card-content>
           <mat-card-actions>
+            @if (mission.is_joined) {
+            <button mat-flat-button color="primary" (click)="onOpenWorkspace(mission.id)">
+              <mat-icon>launch</mat-icon> Open Workspace
+            </button>
+            } @else {
             <button mat-flat-button color="primary" (click)="onJoinMission(mission.id)">Join</button>
+            }
           </mat-card-actions>
         </mat-card>
         }

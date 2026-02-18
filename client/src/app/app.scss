@@ -3,7 +3,8 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background-color: #F8FAFC; // Main content background light gray
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
 }
 
 .main-wrapper {
@@ -18,7 +19,7 @@
   overflow-y: auto;
   padding: 0;
   transition: all 0.3s ease;
-  margin-left: 260px; // Default sidebar width
+  margin-left: 260px;
 
   &.expanded {
     margin-left: 70px;

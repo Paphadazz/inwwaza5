@@ -6,3 +6,4 @@ pub mod mission_statuses;
 pub mod uploaded_img;
 pub mod task_model;
 pub mod dashboard_model;
+pub mod mission_submission_model;

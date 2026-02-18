@@ -10,6 +10,7 @@ import { MissionManager } from './mission-manager/mission-manager'
 import { MissionWorkspace } from './mission-workspace/mission-workspace'
 import { Dashboard } from './dashboard/dashboard'
 import { JoinedMissions } from './joined-missions/joined-missions'
+import { MissionEvidence } from './mission-evidence/mission-evidence'
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -18,6 +19,7 @@ export const routes: Routes = [
     { path: 'missions', component: Missions, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'missions/joined', component: JoinedMissions, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'missions/:id/workspace', component: MissionWorkspace, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
+    { path: 'missions/:id/evidence', component: MissionEvidence, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'my-mission', component: MissionManager, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'dashboard', component: Dashboard, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'chief', component: MissionManager, canActivate: [authGuard], runGuardsAndResolvers: 'always' },

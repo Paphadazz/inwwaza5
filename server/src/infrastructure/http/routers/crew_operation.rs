@@ -13,26 +13,29 @@ use crate::{
     application::use_cases::crew_operation::CrewOperationUseCase, 
     domain::repositories::{
         crew_operation::CrewOperationRepository, mission_viewing::MissionViewingRepository,
+        mission_submissions::MissionSubmissionsRepository,
     },
     infrastructure::{
         database::{
             postgresql_connection::PgPoolSquad,
             repositories::{
                 crew_operation::CrewOperationPostgres, mission_viewing::MissionViewingPostgres,
+                mission_submissions::MissionSubmissionsPostgres,
             },
         },
         http::middlewares::auth::authorization,
     },
 };
 
-pub async fn join<T1, T2>(
-    State(user_case): State<Arc<CrewOperationUseCase<T1, T2>>>,
+pub async fn join<T1, T2, T3>(
+    State(user_case): State<Arc<CrewOperationUseCase<T1, T2, T3>>>,
     Extension(user_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: CrewOperationRepository + Send + Sync + 'static,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionSubmissionsRepository + Send + Sync,
 {
     match user_case.join(mission_id, user_id).await {
         Ok(_) => (
@@ -48,14 +51,15 @@ where
     }
 }
 
-pub async fn leave<T1, T2>(
-    State(user_case): State<Arc<CrewOperationUseCase<T1, T2>>>,   
+pub async fn leave<T1, T2, T3>(
+    State(user_case): State<Arc<CrewOperationUseCase<T1, T2, T3>>>,   
     Extension(user_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: CrewOperationRepository + Send + Sync + 'static,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionSubmissionsRepository + Send + Sync,
 {
     match user_case.leave(mission_id, user_id).await {
         Ok(_) => (
@@ -74,9 +78,11 @@ where
 pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let crew_operation_repository = CrewOperationPostgres::new(Arc::clone(&db_pool));
     let viewing_repositiory = MissionViewingPostgres::new(Arc::clone(&db_pool));
+    let submission_repository = MissionSubmissionsPostgres::new(Arc::clone(&db_pool));
     let user_case = CrewOperationUseCase::new(
         Arc::new(crew_operation_repository),
         Arc::new(viewing_repositiory),
+        Arc::new(submission_repository),
     );
 
     Router::new()

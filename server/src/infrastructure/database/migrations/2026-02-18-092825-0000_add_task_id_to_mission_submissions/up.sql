@@ -1,0 +1,1 @@
+ALTER TABLE mission_submissions ADD COLUMN task_id INTEGER REFERENCES tasks(id) ON DELETE SET NULL;

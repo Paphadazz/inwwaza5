@@ -1,0 +1,70 @@
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon>assignment_turned_in</mat-icon>
+    Submission Review: {{data.task.title}}
+</h2>
+
+<mat-dialog-content class="submission-dialog-content">
+    <div class="submission-meta">
+        <div class="meta-row">
+            <span class="label">Submitter:</span>
+            <span class="value">{{data.submission.brawler_name}}</span>
+        </div>
+        <div class="meta-row">
+            <span class="label">Sent At:</span>
+            <span class="value">{{data.submission.submitted_at | date:'medium'}}</span>
+        </div>
+        <div class="meta-row">
+            <span class="label">File:</span>
+            <span class="value">{{data.submission.file_name}}</span>
+        </div>
+        <div class="meta-row">
+            <span class="label">Type:</span>
+            <mat-chip highlighted>{{data.submission.file_type}}</mat-chip>
+        </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="preview-container" *ngIf="isImage(data.submission.file_type)">
+        <h3>Preview</h3>
+        <div class="image-wrapper">
+            <img [src]="data.submission.file_url" [alt]="data.submission.file_name">
+        </div>
+    </div>
+
+    <div class="no-preview" *ngIf="!isImage(data.submission.file_type)">
+        <mat-icon>insert_drive_file</mat-icon>
+        <p>No visual preview available for this file type.</p>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="submission-details">
+        <h3>Submission Details</h3>
+
+        <mat-form-field appearance="outline" class="full-width" *ngIf="canEdit()">
+            <mat-label>Notes & Instructions for Chief</mat-label>
+            <textarea matInput rows="4" [(ngModel)]="description"
+                placeholder="Add details about your work..."></textarea>
+        </mat-form-field>
+
+        <div class="readonly-description" *ngIf="!canEdit()">
+            <p>{{description() || 'No detailed instructions provided by operative.'}}</p>
+        </div>
+
+        <div class="actions" *ngIf="canEdit()">
+            <button mat-raised-button color="primary" [disabled]="isSaving()" (click)="saveDetails()">
+                <mat-icon>{{isSaving() ? 'hourglass_empty' : 'save'}}</mat-icon>
+                {{isSaving() ? 'Saving...' : 'Update Details'}}
+            </button>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Close</button>
+    <button mat-flat-button color="primary" (click)="download()">
+        <mat-icon>open_in_new</mat-icon>
+        Open Original
+    </button>
+</mat-dialog-actions>

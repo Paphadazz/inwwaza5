@@ -54,17 +54,75 @@
         </div>
     </div>
 
-    <div class="quick-actions">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="action-buttons">
-            <button mat-raised-button color="primary" (click)="navigateToMissions()">
-                <mat-icon>explore</mat-icon>
-                Browse Missions
-            </button>
-            <button mat-raised-button color="accent" (click)="navigateToMyMissions()">
-                <mat-icon>folder</mat-icon>
-                My Missions
-            </button>
+    <div class="chart-section minimalist-analytics">
+        <div class="chart-header">
+            <h2 class="section-title">
+                <mat-icon>insights</mat-icon>
+                Mission Trends (Current Year)
+            </h2>
+            <div class="chart-legend">
+                <span class="legend-item created">Created</span>
+                <span class="legend-item joined">Joined</span>
+                <span class="legend-item completed">Completed</span>
+                <span class="legend-item active">Active</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <!-- Y-Axis Labels -->
+            <div class="y-axis-labels">
+                @for (label of getYLabels(); track label) {
+                <span>{{label}}</span>
+                }
+            </div>
+
+            <div class="svg-wrapper">
+                <svg viewBox="0 0 1000 300" preserveAspectRatio="none" class="trend-chart">
+                    <!-- Background Grid -->
+                    <g class="grid-lines">
+                        <!-- Horizontal Grid Lines -->
+                        @for (label of getYLabels(); track label) {
+                        <line x1="40" [attr.y1]="getCoordinates(0, label).y" x2="960"
+                            [attr.y2]="getCoordinates(0, label).y" class="grid-line horizontal" />
+                        }
+
+                        <!-- Vertical Grid Lines (Months) -->
+                        @for (month of months; track month; let i = $index) {
+                        <line [attr.x1]="getCoordinates(i, 0).x" y1="40" [attr.x2]="getCoordinates(i, 0).x" y2="260"
+                            class="grid-line vertical" />
+                        }
+                    </g>
+
+                    <!-- Trend Lines -->
+                    <path [attr.d]="getSmoothPath('created')" class="chart-path smooth created" />
+                    <path [attr.d]="getSmoothPath('joined')" class="chart-path smooth joined" />
+                    <path [attr.d]="getSmoothPath('completed')" class="chart-path smooth completed" />
+                    <path [attr.d]="getSmoothPath('active')" class="chart-path smooth active" />
+
+                    <!-- Data Points -->
+                    @let data = summary()!.chart_data;
+                    <g class="data-points">
+                        @for (p of data; track p.date; let i = $index) {
+                        <circle [attr.cx]="getCoordinates(i, p.created, 'created').x"
+                            [attr.cy]="getCoordinates(i, p.created, 'created').y" r="4" class="point created" />
+                        <circle [attr.cx]="getCoordinates(i, p.joined, 'joined').x"
+                            [attr.cy]="getCoordinates(i, p.joined, 'joined').y" r="4" class="point joined" />
+                        <circle [attr.cx]="getCoordinates(i, p.completed, 'completed').x"
+                            [attr.cy]="getCoordinates(i, p.completed, 'completed').y" r="4" class="point completed" />
+                        <circle [attr.cx]="getCoordinates(i, p.active, 'active').x"
+                            [attr.cy]="getCoordinates(i, p.active, 'active').y" r="4" class="point active" />
+                        }
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="chart-footer">
+            <div class="x-axis-labels">
+                @for (month of months; track month) {
+                <span>{{month}}</span>
+                }
+            </div>
         </div>
     </div>
     } @else if (!loading() && !summary()) {

@@ -1,0 +1,4 @@
+ALTER TABLE mission_submissions 
+    ALTER COLUMN id TYPE INTEGER,
+    ALTER COLUMN mission_id TYPE INTEGER,
+    ALTER COLUMN brawler_id TYPE INTEGER;

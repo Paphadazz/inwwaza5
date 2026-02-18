@@ -12,6 +12,12 @@
                 <mat-icon>dashboard</mat-icon>
                 View Mission Summary
             </button>
+            <button mat-stroked-button color="accent" (click)="goToEvidence()" *ngIf="isUserChief()">
+                <mat-icon>folder_shared</mat-icon>
+                Evidence Repository
+            </button>
+            <input type="file" id="fileInput" style="display: none" (change)="onFileSelected($event)"
+                accept=".png,.jpeg,.jpg,.doc,.docx,.pdf">
             <button mat-stroked-button color="warn" (click)="leave()" *ngIf="!isUserChief()">
                 <mat-icon ripple>logout</mat-icon>
                 Leave Mission
@@ -77,10 +83,57 @@
                                 <span>Priority: {{task.priority || 'Medium'}}</span>
                                 <span *ngIf="task.member_id"> • Assigned to: {{task.member_id}}</span>
                             </div>
-                            <div matListItemMeta *ngIf="isUserChief()">
-                                <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
+                            <div matListItemMeta>
+                                <!-- Member Action: Submit Work for specific task -->
+                                <ng-container *ngIf="!isUserChief() && task.member_id === currentUserId()">
+                                    <button mat-icon-button color="primary" *ngIf="!task.has_submission"
+                                        (click)="triggerFileInput(task.id)" matTooltip="Submit Work for this Task">
+                                        <mat-icon>upload_file</mat-icon>
+                                    </button>
+
+                                    <!-- Member can view their own submission -->
+                                    <button mat-icon-button color="primary" (click)="viewSubmission(task.id)"
+                                        *ngIf="task.has_submission" matTooltip="View My Submission">
+                                        <mat-icon>visibility</mat-icon>
+                                    </button>
+
+                                    <!-- Member can delete/retract their own submission -->
+                                    <button mat-icon-button color="warn" (click)="deleteSubmission(task.id)"
+                                        *ngIf="task.has_submission && task.status !== 'Success'"
+                                        matTooltip="Retract and Resubmit">
+                                        <mat-icon>delete_sweep</mat-icon>
+                                    </button>
+                                </ng-container>
+
+                                <!-- Chief Actions -->
+                                <ng-container *ngIf="isUserChief()">
+                                    <!-- View Submission if available -->
+                                    <button mat-icon-button color="primary" (click)="viewSubmission(task.id)"
+                                        *ngIf="task.has_submission" matTooltip="View Submission">
+                                        <mat-icon>visibility</mat-icon>
+                                    </button>
+
+                                    <!-- Update Status -->
+                                    <button mat-icon-button [matMenuTriggerFor]="statusMenu" matTooltip="Update Status">
+                                        <mat-icon>edit_note</mat-icon>
+                                    </button>
+                                    <mat-menu #statusMenu="matMenu">
+                                        <button mat-menu-item
+                                            (click)="updateTaskStatus(task.id, 'Pending')">Pending</button>
+                                        <button mat-menu-item (click)="updateTaskStatus(task.id, 'In Progress')">In
+                                            Progress</button>
+                                        <button mat-menu-item
+                                            (click)="updateTaskStatus(task.id, 'Review')">Review</button>
+                                        <button mat-menu-item
+                                            (click)="updateTaskStatus(task.id, 'Success')">Success</button>
+                                        <button mat-menu-item
+                                            (click)="updateTaskStatus(task.id, 'Failed')">Failed</button>
+                                    </mat-menu>
+
+                                    <button mat-icon-button color="warn" (click)="deleteTask(task.id)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </ng-container>
                             </div>
                         </mat-list-item>
                     </mat-list>
@@ -95,8 +148,14 @@
                 <mat-card-header>
                     <div class="members-header">
                         <mat-card-title>Squad Roster</mat-card-title>
-                        <div class="count-badge">
-                            {{memberCount()}} / {{m.max_members}}
+                        <div class="header-right">
+                            <div class="count-badge">
+                                {{memberCount()}} / {{m.max_members}}
+                            </div>
+                            <button mat-icon-button class="settings-btn" *ngIf="isUserChief()"
+                                (click)="openSquadSettings()" matTooltip="Squad Configuration">
+                                <mat-icon>settings</mat-icon>
+                            </button>
                         </div>
                     </div>
                 </mat-card-header>
@@ -109,13 +168,16 @@
                             <div class="member-content">
                                 <div class="member-header">
                                     <span class="member-name">{{member.display_name}}</span>
+                                    <span *ngIf="isCurrentUser(member)" class="you-badge">
+                                        <mat-icon>star</mat-icon>
+                                        You
+                                    </span>
                                 </div>
 
                                 <div class="member-badges">
                                     <mat-chip-set>
                                         <mat-chip *ngIf="isChief(member)" class="chief-chip"
                                             highlighted>Chief</mat-chip>
-                                        <mat-chip *ngIf="isCurrentUser(member)" class="you-chip">You</mat-chip>
                                     </mat-chip-set>
 
                                     <div *ngIf="!isUserChief() || isChief(member)" class="role-display">
@@ -135,6 +197,11 @@
                                         </button>
                                     </mat-menu>
 
+                                    <button mat-icon-button color="primary" *ngIf="isUserChief() && !isChief(member)"
+                                        (click)="viewMemberEvidence(member)" matTooltip="View Evidence">
+                                        <mat-icon>folder_shared</mat-icon>
+                                    </button>
+
                                     <button mat-icon-button color="warn" *ngIf="isUserChief() && !isChief(member)"
                                         (click)="kickMember(member.id)" matTooltip="Remove Member">
                                         <mat-icon>person_remove</mat-icon>
@@ -144,21 +211,6 @@
                         </div>
                     </mat-list-item>
                 </mat-list>
-            </mat-card>
-
-            <!-- Settings for Chief (Moved from Details) -->
-            <mat-card class="settings-card" *ngIf="isUserChief()">
-                <mat-card-header>
-                    <mat-card-title><mat-icon>settings</mat-icon> Squad Configuration</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <mat-form-field appearance="fill" class="full-width">
-                        <mat-label>Max Operatives</mat-label>
-                        <input matInput type="number" [value]="m.max_members" #maxInput
-                            (change)="updateMaxMembers(maxInput.value)">
-                        <mat-hint>Set team size limit</mat-hint>
-                    </mat-form-field>
-                </mat-card-content>
             </mat-card>
         </div>
     </div>

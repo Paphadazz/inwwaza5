@@ -17,10 +17,14 @@ impl Base64Img {
             Err(_) => return Err(anyhow::anyhow!("invalid img data !!")),
         };
         let file_type = match infer::get(&bytes) {
-            Some(t) if t.mime_type() == "image/png" || t.mime_type() == "image/jpeg" => {
+            Some(t) if t.mime_type() == "image/png" 
+                    || t.mime_type() == "image/jpeg" 
+                    || t.mime_type() == "application/pdf"
+                    || t.mime_type() == "application/msword"
+                    || t.mime_type() == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => {
                 t.mime_type()
             }
-            _ => return Err(anyhow::anyhow!("un-support file type")),
+            _ => return Err(anyhow::anyhow!("Unsupported file type. Please use PNG, JPEG, PDF, or DOC/DOCX.")),
         };
 
         let base64text = format!("data:{};base64,{}", file_type, data);

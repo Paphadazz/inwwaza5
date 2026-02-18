@@ -2,6 +2,7 @@ use crate::domain::{
     entities::tasks::{CreateTaskEntity, UpdateTaskEntity},
     repositories::{
         mission_viewing::MissionViewingRepository, tasks::TaskRepository,
+        mission_submissions::MissionSubmissionsRepository,
     },
     value_objects::task_model::{CreateTaskModel, TaskModel, UpdateTaskModel},
 };
@@ -9,24 +10,32 @@ use anyhow::Result;
 use chrono::Local;
 use std::sync::Arc;
 
-pub struct TaskUseCase<T1, T2>
+pub struct TaskUseCase<T1, T2, T3>
 where
     T1: TaskRepository + Send + Sync,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionSubmissionsRepository + Send + Sync,
 {
     task_repository: Arc<T1>,
     mission_viewing_repository: Arc<T2>,
+    mission_submissions_repository: Arc<T3>,
 }
 
-impl<T1, T2> TaskUseCase<T1, T2>
+impl<T1, T2, T3> TaskUseCase<T1, T2, T3>
 where
     T1: TaskRepository + Send + Sync,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionSubmissionsRepository + Send + Sync,
 {
-    pub fn new(task_repository: Arc<T1>, mission_viewing_repository: Arc<T2>) -> Self {
+    pub fn new(
+        task_repository: Arc<T1>,
+        mission_viewing_repository: Arc<T2>,
+        mission_submissions_repository: Arc<T3>,
+    ) -> Self {
         Self {
             task_repository,
             mission_viewing_repository,
+            mission_submissions_repository,
         }
     }
 
@@ -73,6 +82,7 @@ where
             status: model.status,
             priority: model.priority,
             updated_at: Some(Local::now().naive_local()),
+            has_submission: None,
         };
 
         self.task_repository.update(task_id, entity).await
@@ -86,6 +96,9 @@ where
             return Err(anyhow::anyhow!("Only the Chief can delete tasks"));
         }
 
+        // Manual cleanup for associated submissions as fallback to CASCADE
+        self.mission_submissions_repository.delete_all_by_task(task_id).await?;
+        
         self.task_repository.delete(task_id).await
     }
 

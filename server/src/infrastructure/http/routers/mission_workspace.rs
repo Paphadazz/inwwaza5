@@ -21,6 +21,7 @@ use crate::{
             postgresql_connection::PgPoolSquad,
             repositories::{
                 crew_operation::CrewOperationPostgres,
+                mission_submissions::MissionSubmissionsPostgres,
                 mission_viewing::MissionViewingPostgres,
                 tasks::TaskPostgres,
             },
@@ -47,10 +48,11 @@ pub struct UpdateSettingsRequest {
 }
 
 pub struct WorkspaceState {
-    pub crew_case: Arc<CrewOperationUseCase<CrewOperationPostgres, MissionViewingPostgres>>,
+    pub crew_case: Arc<CrewOperationUseCase<CrewOperationPostgres, MissionViewingPostgres, MissionSubmissionsPostgres>>,
     pub view_case: Arc<MissionViewingUseCase<MissionViewingPostgres>>,
     pub management_case: Arc<crate::application::use_cases::mission_management::MissionManagementUseCase<crate::infrastructure::database::repositories::mission_management::MissionManagementPostgres, crate::infrastructure::database::repositories::mission_viewing::MissionViewingPostgres>>,
-    pub task_case: Arc<crate::application::use_cases::tasks::TaskUseCase<TaskPostgres, MissionViewingPostgres>>,
+    pub task_case: Arc<crate::application::use_cases::tasks::TaskUseCase<TaskPostgres, MissionViewingPostgres, MissionSubmissionsPostgres>>,
+    pub submission_case: Arc<crate::application::use_cases::mission_submissions::MissionSubmissionUseCase<MissionViewingPostgres, MissionSubmissionsPostgres, TaskPostgres>>,
 }
 
 pub type AppState = Arc<WorkspaceState>;
@@ -151,15 +153,18 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let crew_repo = Arc::new(CrewOperationPostgres::new(Arc::clone(&db_pool)));
     let view_repo = Arc::new(MissionViewingPostgres::new(Arc::clone(&db_pool)));
 
+    let submission_repo = Arc::new(MissionSubmissionsPostgres::new(Arc::clone(&db_pool)));
     let crew_case = Arc::new(CrewOperationUseCase::new(
         Arc::clone(&crew_repo),
         Arc::clone(&view_repo),
+        Arc::clone(&submission_repo),
     ));
 
     let task_repo = Arc::new(TaskPostgres::new(Arc::clone(&db_pool)));
     let task_case = Arc::new(crate::application::use_cases::tasks::TaskUseCase::new(
         Arc::clone(&task_repo),
         Arc::clone(&view_repo),
+        Arc::clone(&submission_repo),
     ));
     
     let view_case = Arc::new(MissionViewingUseCase::new(Arc::clone(&view_repo)));
@@ -170,11 +175,19 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         Arc::clone(&view_repo),
     ));
 
+    let submission_repo = Arc::new(MissionSubmissionsPostgres::new(Arc::clone(&db_pool)));
+    let submission_case = Arc::new(crate::application::use_cases::mission_submissions::MissionSubmissionUseCase::new(
+        Arc::clone(&view_repo),
+        Arc::clone(&submission_repo),
+        Arc::clone(&task_repo),
+    ));
+
     let state: AppState = Arc::new(WorkspaceState {
         crew_case,
         view_case,
         management_case,
         task_case,
+        submission_case,
     });
 
     Router::new()
@@ -185,6 +198,11 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         .route("/{mission_id}/members/{brawler_id}/role", post(update_member_role))
         .route("/{mission_id}/members/{brawler_id}/kick", delete(kick_member))
         .route("/{mission_id}/settings", post(update_settings))
+        .route("/{mission_id}/submit", post(crate::infrastructure::http::handlers::mission_submission::submit_work))
+        .route("/{mission_id}/submissions", get(crate::infrastructure::http::handlers::mission_submission::get_mission_submissions))
+        .route("/{mission_id}/submissions/{submission_id}", delete(crate::infrastructure::http::handlers::mission_submission::delete_submission))
+        .route("/{mission_id}/submissions/{submission_id}/details", patch(crate::infrastructure::http::handlers::mission_submission::update_submission_details))
+        .route("/{mission_id}/tasks/{task_id}/submission", get(crate::infrastructure::http::handlers::mission_submission::get_task_submission))
         // Task Routes
         .route("/{mission_id}/tasks", get(crate::infrastructure::http::routers::tasks::get_tasks).post(crate::infrastructure::http::routers::tasks::create_task))
         .route("/{mission_id}/tasks/{task_id}", patch(crate::infrastructure::http::routers::tasks::update_task).delete(crate::infrastructure::http::routers::tasks::delete_task))

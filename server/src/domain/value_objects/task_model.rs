@@ -18,6 +18,7 @@ pub struct TaskModel {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub has_submission: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

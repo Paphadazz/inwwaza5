@@ -3,6 +3,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { PassportService } from '../_services/passport-service';
+import { ThemeService } from '../_services/theme-service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -11,12 +12,12 @@ import { CommonModule } from '@angular/common';
   selector: 'app-navbar',
   standalone: true,
   imports: [
-    CommonModule, 
-    MatToolbarModule, 
-    MatButtonModule, 
-    RouterLink, 
-    RouterLinkActive, 
-    MatMenuModule, 
+    CommonModule,
+    MatToolbarModule,
+    MatButtonModule,
+    RouterLink,
+    RouterLinkActive,
+    MatMenuModule,
     MatIconModule
   ],
   templateUrl: './navbar.html',
@@ -25,6 +26,7 @@ import { CommonModule } from '@angular/common';
 export class Navbar {
   private _passport = inject(PassportService);
   private _router = inject(Router);
+  themeService = inject(ThemeService);
 
   @Output() toggleSidebar = new EventEmitter<void>();
 

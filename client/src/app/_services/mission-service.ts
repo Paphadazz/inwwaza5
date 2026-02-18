@@ -53,12 +53,12 @@ export class MissionService {
   }
 
   async join(missionId: number): Promise<void> {
-    const url = this._api_url + '/crew-operation/join/' + missionId
+    const url = this._api_url + '/crew/join/' + missionId
     await firstValueFrom(this._http.post(url, {}))
   }
 
   async leave(missionId: number): Promise<void> {
-    const url = this._api_url + '/crew-operation/leave/' + missionId
+    const url = this._api_url + '/crew/leave/' + missionId
     await firstValueFrom(this._http.delete(url))
   }
 
@@ -135,5 +135,30 @@ export class MissionService {
     }
 
     return params.join('&')
+  }
+  async submitWork(missionId: number, file: File, taskId?: number): Promise<void> {
+    const url = this._api_url + '/v1/missions/' + missionId + '/submit' + (taskId ? `?task_id=${taskId}` : '')
+    const formData = new FormData()
+    formData.append('file', file)
+    await firstValueFrom(this._http.post(url, formData))
+  }
+
+  async getTaskSubmission(missionId: number, taskId: number): Promise<any> {
+    const url = `${this._api_url}/v1/missions/${missionId}/tasks/${taskId}/submission`;
+    return await firstValueFrom(this._http.get<any>(url));
+  }
+
+  async getMissionSubmissions(missionId: number): Promise<any[]> {
+    const url = `${this._api_url}/v1/missions/${missionId}/submissions`;
+    return await firstValueFrom(this._http.get<any[]>(url));
+  }
+
+  async deleteSubmission(missionId: number, submissionId: number): Promise<void> {
+    const url = `${this._api_url}/v1/missions/${missionId}/submissions/${submissionId}`;
+    await firstValueFrom(this._http.delete(url));
+  }
+  async updateSubmissionDetails(missionId: number, submissionId: number, description: string): Promise<void> {
+    const url = `${this._api_url}/v1/missions/${missionId}/submissions/${submissionId}/details`;
+    await firstValueFrom(this._http.patch(url, { description }));
   }
 }

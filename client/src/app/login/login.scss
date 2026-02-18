@@ -5,13 +5,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); // Light blue gradient
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
 
     h3 {
         margin: 0;
         padding: 0;
         margin-bottom: 1.5em;
-        color: #1565c0; // Dark blue text
+        color: #1565c0;
         text-align: center;
         font-weight: 500;
         letter-spacing: 1px;
@@ -26,12 +26,13 @@
 
     mat-card {
         padding: 2.5em;
-        background-color: #ffffff;
+        background-color: var(--bg-card) !important;
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 400px;
         min-width: 320px;
+        transition: background-color 0.3s ease;
     }
 
     mat-card-header {
@@ -52,7 +53,7 @@
     button.blue {
         font-size: 16px;
         width: 100%;
-        background-color: #1565c0; // Darker blue
+        background-color: #1565c0;
         color: white;
         padding: 0.5em;
         border-radius: 8px;
@@ -70,7 +71,7 @@
     }
 
     .toggle {
-        color: #546e7a;
+        color: var(--text-muted);
         width: 100%;
         text-align: center;
         font-size: 14px;
@@ -91,7 +92,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #90a4ae;
+        color: var(--text-muted);
         font-family: Roboto, sans-serif;
         margin: 1.5em 0;
         font-size: 14px;
@@ -100,7 +101,7 @@
         &::after {
             content: "";
             flex: 1;
-            border-bottom: 1px solid #cfd8dc;
+            border-bottom: 1px solid var(--border-color);
         }
 
         &::before {

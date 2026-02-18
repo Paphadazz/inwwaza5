@@ -1,0 +1,124 @@
+.dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #1a73e8;
+    margin-bottom: 16px;
+
+    mat-icon {
+        color: #1a73e8;
+    }
+}
+
+.submission-dialog-content {
+    min-width: 400px;
+    max-width: 600px;
+
+    .submission-meta {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            .label {
+                font-weight: 500;
+                color: #5f6368;
+                width: 100px;
+            }
+
+            .value {
+                color: #202124;
+            }
+        }
+    }
+
+    .preview-container {
+        margin-top: 20px;
+
+        h3 {
+            font-size: 1.1rem;
+            color: #3c4043;
+            margin-bottom: 12px;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #dadce0;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+
+            img {
+                max-width: 100%;
+                max-height: 400px;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .no-preview {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #70757a;
+        padding: 40px;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+        }
+    }
+}
+
+mat-divider {
+    margin: 24px 0;
+}
+
+.submission-details {
+    margin-top: 16px;
+
+    h3 {
+        font-size: 1.1rem;
+        color: #3c4043;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .readonly-description {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 4px solid #1a73e8;
+
+        p {
+            margin: 0;
+            color: #3c4043;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+    }
+
+    .actions {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+    }
+}

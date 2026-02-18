@@ -44,14 +44,6 @@ impl TaskRepository for TaskPostgres {
         Ok(())
     }
 
-    async fn get_by_id(&self, task_id: i32) -> Result<TaskModel> {
-        let mut conn = self.db_pool.get()?;
-        let result = tasks::table
-            .find(task_id)
-            .get_result::<TaskModel>(&mut conn)?;
-        Ok(result)
-    }
-
     async fn get_by_mission_id(&self, mission_id: i32) -> Result<Vec<TaskModel>> {
         let mut conn = self.db_pool.get()?;
         let result = tasks::table
@@ -67,6 +59,14 @@ impl TaskRepository for TaskPostgres {
             .filter(tasks::member_id.eq(member_id))
             .order(tasks::created_at.desc())
             .load::<TaskModel>(&mut conn)?;
+        Ok(result)
+    }
+
+    async fn get_by_id(&self, task_id: i32) -> Result<TaskModel> {
+        let mut conn = self.db_pool.get()?;
+        let result = tasks::table
+            .find(task_id)
+            .get_result::<TaskModel>(&mut conn)?;
         Ok(result)
     }
 }

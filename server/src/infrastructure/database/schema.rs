@@ -31,6 +31,20 @@ diesel::table! {
 }
 
 diesel::table! {
+    mission_submissions (id) {
+        id -> Int4,
+        mission_id -> Int4,
+        brawler_id -> Int4,
+        file_url -> Text,
+        file_name -> Text,
+        file_type -> Text,
+        submitted_at -> Timestamptz,
+        task_id -> Nullable<Int4>,
+        description -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     missions (id) {
         id -> Int4,
         #[max_length = 255]
@@ -65,11 +79,21 @@ diesel::table! {
         created_by -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        has_submission -> Bool,
     }
 }
 
 diesel::joinable!(crew_memberships -> missions (mission_id));
+diesel::joinable!(mission_submissions -> brawlers (brawler_id));
+diesel::joinable!(mission_submissions -> missions (mission_id));
+diesel::joinable!(mission_submissions -> tasks (task_id));
 diesel::joinable!(missions -> brawlers (chief_id));
 diesel::joinable!(tasks -> missions (mission_id));
 
-diesel::allow_tables_to_appear_in_same_query!(brawlers, crew_memberships, missions, tasks,);
+diesel::allow_tables_to_appear_in_same_query!(
+    brawlers,
+    crew_memberships,
+    mission_submissions,
+    missions,
+    tasks,
+);

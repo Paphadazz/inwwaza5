@@ -14,13 +14,13 @@ pub struct UploadImageOptions {
     pub transformation: Option<String>,
 }
 
-fn form_builder(option: UploadImageOptions, cloud_env: &CloudinaryEnv) -> Result<Form> {
+fn form_builder(option: UploadImageOptions, cloud_env: &CloudinaryEnv, resource_type: &str) -> Result<Form> {
     let mut form = Form::new();
     let timestamp = Utc::now().timestamp_millis().to_string();
     let mut hasher = Sha1::new();
 
     let mut params_to_sign: HashMap<String, String> = HashMap::new();
-    params_to_sign.insert("resource_type".to_string(), "image".to_string());
+    params_to_sign.insert("resource_type".to_string(), resource_type.to_string());
     params_to_sign.insert("timestamp".to_string(), timestamp.clone());
     if let Some(folder_name) = option.folder {
         params_to_sign.insert("folder".to_string(), folder_name);
@@ -62,11 +62,37 @@ pub async fn upload(base64_image: Base64Img, option: UploadImageOptions) -> Resu
     let cloud_env = get_cloudinary_env()?;
 
     let file = Part::text(base64_image.into_inner());
-    let form = form_builder(option, &cloud_env)?;
+    let form = form_builder(option, &cloud_env, "image")?;
     let multipart = form.part("file", file);
     let client = reqwest::Client::new();
     let url = format!(
         "https://api.cloudinary.com/v1_1/{}/image/upload",
+        cloud_env.cloud_name
+    );
+
+    let response = client
+        .post(&url)
+        .multipart(multipart)
+        .send()
+        .await
+        .context(format!("upload to {}", url))?;
+
+    let text = response.text().await?;
+    println!("Cloudinary response: {}", text);
+    let json: UploadedImg =
+        serde_json::from_str(&text).context(format!("failed to parse:\n\n {}", text))?;
+    Ok(json)
+}
+
+pub async fn upload_auto(base64_data: String, option: UploadImageOptions) -> Result<UploadedImg> {
+    let cloud_env = get_cloudinary_env()?;
+
+    let file = Part::text(base64_data);
+    let form = form_builder(option, &cloud_env, "auto")?;
+    let multipart = form.part("file", file);
+    let client = reqwest::Client::new();
+    let url = format!(
+        "https://api.cloudinary.com/v1_1/{}/auto/upload",
         cloud_env.cloud_name
     );
 

@@ -44,14 +44,24 @@ export class Home implements OnInit {
   async loadDashboardData() {
     this.isLoading.set(true);
     try {
-      // Fetch Active Missions (joined by user)
+      const currentUserId = this.user()?.id;
+
+      // Fetch Active Missions (owned + joined)
       const myMissions = await this.missionService.getMyMissions();
-      this.activeMissions.set(myMissions.slice(0, 5));
+      const joinedMissions = await this.missionService.getJoined();
+
+      // Merge, deduplicate, and limit
+      const combined = [...myMissions, ...joinedMissions];
+      const unique = Array.from(new Map(combined.map(m => [m.id, m])).values());
+      this.activeMissions.set(unique.slice(0, 5));
 
       // Fetch Featured/Open Missions
       const allOpen = await this.missionService.getByFilter({ status: 'Open' });
-      // Filter out those already joined if possible, or just take first 4
-      this.featuredMissions.set(allOpen.filter(m => !m.is_joined).slice(0, 4));
+
+      // Filter out missions owned by the user
+      const filtered = allOpen.filter(m => m.chief_id !== currentUserId);
+
+      this.featuredMissions.set(filtered.slice(0, 4));
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -59,14 +69,19 @@ export class Home implements OnInit {
     }
   }
 
+  onOpenWorkspace(id: number) {
+    this.router.navigate(['/missions', id, 'workspace']);
+  }
+
   onViewMission(id: number) {
-    this.router.navigate(['/missions']); // Or a specific mission detail path if it exists
+    this.onOpenWorkspace(id);
   }
 
   async onJoinMission(id: number) {
     try {
       await this.missionService.join(id);
-      await this.loadDashboardData(); // Refresh data
+      // After joining, immediately navigate to the workspace
+      this.onOpenWorkspace(id);
     } catch (error) {
       console.error('Error joining mission:', error);
     }
